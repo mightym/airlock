@@ -8,7 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface ALAppDelegate : NSObject <NSApplicationDelegate>
+@interface ALAppDelegate : NSObject <NSApplicationDelegate> {
+
+IBOutlet NSMenu *statusMenu;
+    NSStatusItem *statusItem;
+    NSImage *statusImage;
+    NSImage *statusHighlightImage;
+}
+
 
 @property (assign) IBOutlet NSWindow *window;
 
@@ -17,5 +24,6 @@
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 - (IBAction)saveAction:(id)sender;
+- (IBAction)disconnect:(id)sender;
 
 @end

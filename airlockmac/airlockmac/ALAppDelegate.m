@@ -14,6 +14,17 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
+- (void)awakeFromNib {
+    
+    statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    [statusItem setImage:[NSImage imageNamed:@"statusIcon"]];
+    [statusItem setAlternateImage:[NSImage imageNamed:@"statusIconInverted"]];
+    [statusItem setMenu:statusMenu];
+    [statusItem setToolTip:@"Airlock"];
+    [statusItem setHighlightMode:YES];
+    
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application

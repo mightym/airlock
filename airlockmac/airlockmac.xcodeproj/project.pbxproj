@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D0D4E931835563600D2C238 /* statusIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 4D0D4E911835563600D2C238 /* statusIcon.tif */; };
+		4D0D4E941835563600D2C238 /* statusIconInverted.tif in Resources */ = {isa = PBXBuildFile; fileRef = 4D0D4E921835563600D2C238 /* statusIconInverted.tif */; };
 		4D84C01B1833D1D100F3D2D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D84C01A1833D1D100F3D2D9 /* Cocoa.framework */; };
 		4D84C0251833D1D100F3D2D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D84C0231833D1D100F3D2D9 /* InfoPlist.strings */; };
 		4D84C0271833D1D100F3D2D9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C0261833D1D100F3D2D9 /* main.m */; };
@@ -48,6 +50,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D0D4E911835563600D2C238 /* statusIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = statusIcon.tif; sourceTree = "<group>"; };
+		4D0D4E921835563600D2C238 /* statusIconInverted.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = statusIconInverted.tif; sourceTree = "<group>"; };
 		4D84C0171833D1D100F3D2D9 /* airlockmac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = airlockmac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D84C01A1833D1D100F3D2D9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		4D84C01D1833D1D100F3D2D9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -167,6 +171,8 @@
 				4D84C02D1833D1D100F3D2D9 /* ALAppDelegate.m */,
 				4D84C02F1833D1D100F3D2D9 /* MainMenu.xib */,
 				4D84C0351833D1D100F3D2D9 /* Images.xcassets */,
+				4D0D4E911835563600D2C238 /* statusIcon.tif */,
+				4D0D4E921835563600D2C238 /* statusIconInverted.tif */,
 				4D84C0321833D1D100F3D2D9 /* airlockmac.xcdatamodeld */,
 				4D84C0211833D1D100F3D2D9 /* Supporting Files */,
 			);
@@ -324,8 +330,10 @@
 			files = (
 				4D84C0251833D1D100F3D2D9 /* InfoPlist.strings in Resources */,
 				4D84C0361833D1D100F3D2D9 /* Images.xcassets in Resources */,
+				4D0D4E941835563600D2C238 /* statusIconInverted.tif in Resources */,
 				4D84C02B1833D1D100F3D2D9 /* Credits.rtf in Resources */,
 				4D84C0311833D1D100F3D2D9 /* MainMenu.xib in Resources */,
+				4D0D4E931835563600D2C238 /* statusIcon.tif in Resources */,
 				4D84C0501833D1D100F3D2D9 /* airlockmacImporter.mdimporter in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -625,6 +633,7 @@
 				4D84C06C1833D1D100F3D2D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4D84C06D1833D1D100F3D2D9 /* Build configuration list for PBXNativeTarget "airlockmac" */ = {
 			isa = XCConfigurationList;
@@ -633,6 +642,7 @@
 				4D84C06F1833D1D100F3D2D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4D84C0701833D1D100F3D2D9 /* Build configuration list for PBXNativeTarget "airlockmacTests" */ = {
 			isa = XCConfigurationList;
@@ -641,6 +651,7 @@
 				4D84C0721833D1D100F3D2D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

@@ -26,4 +26,8 @@ IBOutlet NSMenu *statusMenu;
 - (IBAction)saveAction:(id)sender;
 - (IBAction)disconnect:(id)sender;
 
+- (IBAction)clickSleepButton:(id)sender;
+
+- (NSString*)userPassword;
+
 @end

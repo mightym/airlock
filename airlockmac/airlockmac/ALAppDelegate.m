@@ -7,12 +7,21 @@
 //
 
 #import "ALAppDelegate.h"
+#import "ALAirlockService.h"
+#import "ALLoginscreenOverlayWindowController.h"
+
+@interface ALAppDelegate () {}
+@property (strong, nonatomic) ALLoginscreenOverlayWindowController* loginOverlay;
+@property (strong, nonatomic) IBOutlet NSSecureTextField* passwordField;
+@end
 
 @implementation ALAppDelegate
 
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
+
+- (void)disconnect:(id)sender {}
 
 - (void)awakeFromNib {
     
@@ -28,6 +37,22 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
+    ALAirlockService *airlockService = [[ALAirlockService alloc] init];
+    [airlockService setLoginwindowDidBecomeFrontmostApplicationBlock:^{
+        NSAppleScript *enterPasswordScript = [[NSAppleScript alloc] initWithSource:@"say \"your mac is now locked!\"\n"];
+        [enterPasswordScript executeAndReturnError:nil];
+        self.loginOverlay = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
+        [self.loginOverlay.window setLevel:9999];
+        [self.loginOverlay showWindow:self];
+    }];
+    [airlockService setLoginwindowDidLoseFrontmostApplicationBlock:^{
+        [self.loginOverlay close];
+        self.loginOverlay = nil;
+        NSAppleScript *enterPasswordScript = [[NSAppleScript alloc] initWithSource:@"say \"your mac is now unlocked.\"\n"];
+        [enterPasswordScript executeAndReturnError:nil];
+    }];
+    [airlockService startMonitoring];
+
 }
 
 // Returns the directory the application uses to store the Core Data store file. This code uses a directory named "com.wirblich.airlockmac" in the user's Application Support directory.
@@ -189,6 +214,16 @@
     }
 
     return NSTerminateNow;
+}
+
+
+- (IBAction)clickSleepButton:(id)sender
+{
+    [ALAirlockService lockScreen];
+}
+
+- (NSString*)userPassword {
+    return self.passwordField.stringValue;
 }
 
 @end

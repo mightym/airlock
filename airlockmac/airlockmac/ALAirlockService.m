@@ -17,6 +17,18 @@
 
 @implementation ALAirlockService
 
+#pragma mark - life cycle
+
++ (instancetype)sharedService {
+    static ALAirlockService *_sharedService = nil;
+    static dispatch_once_t oncePredicate;
+    dispatch_once(&oncePredicate, ^{
+        _sharedService = [[self alloc] init];
+    });
+    
+    return _sharedService;
+}
+
 -(id)init {
     self = [super init];
     if (self) {
@@ -24,6 +36,8 @@
     }
     return self;
 }
+
+#pragma mark - Monitoring
 
 - (void)startMonitoring {
     /*
@@ -45,14 +59,15 @@
         self.loginwindowIsFrontmostApplication = YES;
     } else {
         if (self.loginwindowIsFrontmostApplication
-            && self.loginwindowDidLoseFrontmostApplicationBlock) {
-            self.loginwindowDidLoseFrontmostApplicationBlock();
+            && self.loginwindowDidResignFrontmostApplicationBlock) {
+            self.loginwindowDidResignFrontmostApplicationBlock();
         }
         self.loginwindowIsFrontmostApplication = NO;
     }
     
 }
 
+#pragma mark - login
 
 - (void)loginUser {
     ALAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
@@ -62,51 +77,9 @@
 }
 
 
-+ (void)sendMacToSleep {
-    /*
-     NSAppleScript *script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
-     NSDictionary *errorInfo;
-     [script executeAndReturnError:&errorInfo];
-     */
-    
-    /*
-     [self runCommand:@"/System/Library/CoreServices/Menu\\ Extras/User.menu/Contents/Resources/CGSession -suspend"];
-     */
-}
+#pragma mark - lock screen
 
-
-+ (NSString*)runCommand:(NSString *)commandToRun
-{
-    NSTask *task;
-    task = [[NSTask alloc] init];
-    [task setLaunchPath: @"/bin/sh"];
-    
-    NSArray *arguments = [NSArray arrayWithObjects:
-                          @"-c" ,
-                          [NSString stringWithFormat:@"%@", commandToRun],
-                          nil];
-    NSLog(@"run command: %@",commandToRun);
-    [task setArguments: arguments];
-    
-    NSPipe *pipe;
-    pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
-    
-    NSFileHandle *file;
-    file = [pipe fileHandleForReading];
-    
-    [task launch];
-    
-    NSData *data;
-    data = [file readDataToEndOfFile];
-    
-    NSString *output;
-    output = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-    return output;
-}
-
-
-+ (void)lockScreen
+- (void)lockScreen
 {
     int screenSaverDelayUserSetting = 0;
     
@@ -130,7 +103,7 @@
     }
 }
 
-+ (void)touchSecurityPreferences
+- (void)touchSecurityPreferences
 {
     // necessary for screen saver setting changes to take effect on file-vault-enabled systems
     // NOTE: this *only* works when going from non-zero settings of askForPasswordDelay to zero.
@@ -139,7 +112,7 @@
     [kickSecurityPreferencesScript executeAndReturnError:nil];
 }
 
-+ (void)launchAndQuitSecurityPreferences
+- (void)launchAndQuitSecurityPreferences
 {
     // necessary for screen saver setting changes to take effect on file-vault-enabled systems when going from a askForPasswordDelay setting of zero to a non-zero setting
     NSAppleScript *kickSecurityPreferencesScript = [[NSAppleScript alloc] initWithSource:
@@ -152,7 +125,7 @@
     [kickSecurityPreferencesScript executeAndReturnError:nil];
 }
 
-+ (int)readScreensaveDelay
+- (int)readScreensaveDelay
 {
     NSArray *arguments = @[@"read",@"com.apple.screensaver",@"askForPasswordDelay"];
     
@@ -169,7 +142,7 @@
     return resultString.intValue;
 }
 
-+ (void)setScreensaverDelay:(int)delay
+- (void)setScreensaverDelay:(int)delay
 {
     NSArray *arguments = @[@"write",@"com.apple.screensaver",@"askForPasswordDelay", [NSString stringWithFormat:@"%i", delay]];
     NSTask *resetDelayTask = [[NSTask alloc] init];
@@ -177,4 +150,6 @@
     [resetDelayTask setLaunchPath: @"/usr/bin/defaults"];
     [resetDelayTask launch];
 }
+
+#pragma mark -
 @end

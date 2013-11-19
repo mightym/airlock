@@ -36,23 +36,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // Insert code here to initialize your application
-    ALAirlockService *airlockService = [[ALAirlockService alloc] init];
-    [airlockService setLoginwindowDidBecomeFrontmostApplicationBlock:^{
-        NSAppleScript *enterPasswordScript = [[NSAppleScript alloc] initWithSource:@"say \"your mac is now locked!\"\n"];
-        [enterPasswordScript executeAndReturnError:nil];
-        self.loginOverlay = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
-        [self.loginOverlay.window setLevel:9999];
-        [self.loginOverlay showWindow:self];
-    }];
-    [airlockService setLoginwindowDidLoseFrontmostApplicationBlock:^{
-        [self.loginOverlay close];
-        self.loginOverlay = nil;
-        NSAppleScript *enterPasswordScript = [[NSAppleScript alloc] initWithSource:@"say \"your mac is now unlocked.\"\n"];
-        [enterPasswordScript executeAndReturnError:nil];
-    }];
-    [airlockService startMonitoring];
-
+    [self initializeAirlockService];
 }
 
 // Returns the directory the application uses to store the Core Data store file. This code uses a directory named "com.wirblich.airlockmac" in the user's Application Support directory.
@@ -216,14 +200,40 @@
     return NSTerminateNow;
 }
 
+#pragma mark - init
+
+- (void)initializeAirlockService {
+    [[ALAirlockService sharedService] setLoginwindowDidBecomeFrontmostApplicationBlock:^{
+        [[[NSAppleScript alloc] initWithSource:@"say \"your mac is now locked!\"\n"] executeAndReturnError:nil];
+
+        self.loginOverlay = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
+        [self.loginOverlay.window setLevel:9999];
+        [self.loginOverlay showWindow:self];
+    }];
+    
+    [[ALAirlockService sharedService] setLoginwindowDidResignFrontmostApplicationBlock:^{
+        [self.loginOverlay close];
+        self.loginOverlay = nil;
+        [[[NSAppleScript alloc] initWithSource:@"say \"your mac is now unlocked.\"\n"] executeAndReturnError:nil];
+    }];
+    
+    [[ALAirlockService sharedService] startMonitoring];
+}
+
+#pragma mark - Interface Actions
 
 - (IBAction)clickSleepButton:(id)sender
 {
-    [ALAirlockService lockScreen];
+    [[ALAirlockService sharedService] lockScreen];
 }
+
+#pragma mark - Helper
 
 - (NSString*)userPassword {
     return self.passwordField.stringValue;
 }
+
+
+#pragma mark -
 
 @end

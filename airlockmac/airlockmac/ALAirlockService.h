@@ -11,10 +11,11 @@
 @interface ALAirlockService : NSObject
 
 @property (nonatomic, copy) void (^loginwindowDidBecomeFrontmostApplicationBlock)(void);
-@property (nonatomic, copy) void (^loginwindowDidLoseFrontmostApplicationBlock)(void);
+@property (nonatomic, copy) void (^loginwindowDidResignFrontmostApplicationBlock)(void);
 
++ (instancetype)sharedService;
 - (void)startMonitoring;
 - (void)loginUser;
-+ (void)lockScreen;
+- (void)lockScreen;
 
 @end

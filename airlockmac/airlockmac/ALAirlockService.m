@@ -13,6 +13,7 @@
 
 @interface ALAirlockService () {}
 @property BOOL loginwindowIsFrontmostApplication;
+@property BOOL screenIsSleeping;
 @property (strong, nonatomic) NSTimer *watchFrontmostApplicationTimer;
 @end
 
@@ -36,6 +37,7 @@
     self = [super init];
     if (self) {
         self.loginwindowIsFrontmostApplication = NO;
+        self.screenIsSleeping = YES;
     }
     return self;
 }
@@ -44,10 +46,8 @@
 
 - (void)startMonitoring
 {
-    /*
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveSleepNote:) name:NSWorkspaceScreensDidSleepNotification object:NULL];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveWakeNote:) name:NSWorkspaceScreensDidWakeNotification object:NULL];
-     */
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveSleepNotifiation:) name:NSWorkspaceScreensDidSleepNotification object:NULL];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveWakeNotifiation:) name:NSWorkspaceScreensDidWakeNotification object:NULL];
     
     self.watchFrontmostApplicationTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(fireWatchFrontmostApplicationTimer:) userInfo:nil repeats:YES];
     [self.watchFrontmostApplicationTimer setTolerance:1.0];
@@ -64,6 +64,8 @@
 - (void)fireWatchFrontmostApplicationTimer:(NSTimer*)theTimer
 {
 
+    if (self.screenIsSleeping) return;
+    
     if ([[[[NSWorkspace sharedWorkspace] frontmostApplication] bundleIdentifier] isEqualToString:@"com.apple.loginwindow"]) {
         if (!self.loginwindowIsFrontmostApplication
             && self.loginwindowDidBecomeFrontmostApplicationBlock) {
@@ -77,17 +79,29 @@
         }
         self.loginwindowIsFrontmostApplication = NO;
     }
-    
 }
+
+- (void)receiveSleepNotifiation:(NSNotification*)notification
+{
+    self.screenIsSleeping = YES;
+}
+
+- (void)receiveWakeNotifiation:(NSNotification*)notification
+{
+    self.screenIsSleeping = NO;
+}
+
 
 #pragma mark - login
 
 - (void)loginUser
 {
+    if (self.screenIsSleeping) return;
+    
     ALAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
-    NSAppleScript *enterPasswordScript = [[NSAppleScript alloc] initWithSource:
-                                          [NSString stringWithFormat:@"say \"login\"\ntell application \"System Events\"\n keystroke \"%@\"\nkeystroke return\nend tell", [appDelegate userPassword]]];
-    [enterPasswordScript executeAndReturnError:nil];
+    [[[NSAppleScript alloc] initWithSource:
+     [NSString stringWithFormat:@"say \"login\"\ntell application \"System Events\"\n keystroke \"%@\"\nkeystroke return\nend tell", [appDelegate userPassword]]]
+     executeAndReturnError:nil];
 }
 
 
@@ -95,6 +109,8 @@
 
 - (void)lockScreen
 {
+    if (self.screenIsSleeping) return;
+    
     int screenSaverDelayUserSetting = 0;
     
     screenSaverDelayUserSetting = [self readScreensaveDelay];

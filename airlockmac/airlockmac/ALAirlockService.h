@@ -15,6 +15,7 @@
 
 + (instancetype)sharedService;
 - (void)startMonitoring;
+- (void)stopMonitoring;
 - (void)loginUser;
 - (void)lockScreen;
 

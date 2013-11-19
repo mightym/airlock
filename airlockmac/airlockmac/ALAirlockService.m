@@ -12,14 +12,16 @@
 #include <IOKit/IOKitLib.h>
 
 @interface ALAirlockService () {}
-    @property BOOL loginwindowIsFrontmostApplication;
+@property BOOL loginwindowIsFrontmostApplication;
+@property (strong, nonatomic) NSTimer *watchFrontmostApplicationTimer;
 @end
 
 @implementation ALAirlockService
 
 #pragma mark - life cycle
 
-+ (instancetype)sharedService {
++ (instancetype)sharedService
+{
     static ALAirlockService *_sharedService = nil;
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
@@ -29,7 +31,8 @@
     return _sharedService;
 }
 
--(id)init {
+-(id)init
+{
     self = [super init];
     if (self) {
         self.loginwindowIsFrontmostApplication = NO;
@@ -39,17 +42,27 @@
 
 #pragma mark - Monitoring
 
-- (void)startMonitoring {
+- (void)startMonitoring
+{
     /*
-     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveSleepNote:) name:NSWorkspaceScreensDidSleepNotification object:NULL];
-     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveWakeNote:) name:NSWorkspaceScreensDidWakeNotification object:NULL];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveSleepNote:) name:NSWorkspaceScreensDidSleepNotification object:NULL];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(receiveWakeNote:) name:NSWorkspaceScreensDidWakeNotification object:NULL];
      */
     
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(fireWatchWorkspaceTimer:) userInfo:nil repeats:YES];
-    [timer setTolerance:1.0];
+    self.watchFrontmostApplicationTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(fireWatchFrontmostApplicationTimer:) userInfo:nil repeats:YES];
+    [self.watchFrontmostApplicationTimer setTolerance:1.0];
 }
 
-- (void)fireWatchWorkspaceTimer:(NSTimer*)theTimer {
+- (void)stopMonitoring
+{
+    [self.watchFrontmostApplicationTimer invalidate];
+    self.watchFrontmostApplicationTimer = nil;
+    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+}
+
+
+- (void)fireWatchFrontmostApplicationTimer:(NSTimer*)theTimer
+{
 
     if ([[[[NSWorkspace sharedWorkspace] frontmostApplication] bundleIdentifier] isEqualToString:@"com.apple.loginwindow"]) {
         if (!self.loginwindowIsFrontmostApplication
@@ -69,7 +82,8 @@
 
 #pragma mark - login
 
-- (void)loginUser {
+- (void)loginUser
+{
     ALAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
     NSAppleScript *enterPasswordScript = [[NSAppleScript alloc] initWithSource:
                                           [NSString stringWithFormat:@"say \"login\"\ntell application \"System Events\"\n keystroke \"%@\"\nkeystroke return\nend tell", [appDelegate userPassword]]];

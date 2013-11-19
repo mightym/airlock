@@ -7,12 +7,23 @@
 //
 
 #import "ALAppDelegate.h"
+#import <CoreBluetooth/CoreBluetooth.h>
+
+
+@interface ALAppDelegate () <CBPeripheralManagerDelegate> {}
+
+@property(nonatomic, strong) CBPeripheralManager *peripheral;
+@property(nonatomic, strong) CBMutableCharacteristic *characteristic;
+@property(nonatomic, strong) CBMutableService *service;
+
+@end
 
 @implementation ALAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [self setupBluetooth];
     return YES;
 }
 							
@@ -41,6 +52,61 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma mark -
+- (void)setupBluetooth
+{
+    self.peripheral = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
+}
+
+- (void)enableService
+{
+    NSLog(@"enableService");
+    if (self.service) {
+        [self.peripheral removeService:self.service];
+    }
+
+    self.service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"1E960C29-5247-44E7-BEEE-A91FBC21454F"]
+                                                  primary:YES];
+    
+    self.characteristic = [[CBMutableCharacteristic alloc]
+                           initWithType:[CBUUID UUIDWithString:@"2ABFE74D-52E2-47FD-A574-B7FECB3EE8AF"]
+                           properties:CBCharacteristicPropertyNotify
+                           value:nil
+                           permissions:0];
+    
+    // Assign the characteristic.
+    self.service.characteristics = [NSArray arrayWithObject:self.characteristic];
+    
+    // Add the service to the peripheral manager.
+    [self.peripheral addService:self.service];
+}
+
+- (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral
+{
+    NSLog(@"peripheralManagerDidUpdateState %ld", peripheral.state);
+    if (peripheral.state == CBPeripheralManagerStatePoweredOn) {
+        [self enableService];
+    }
+}
+
+- (void)startAdvertising
+{
+    NSLog(@"startAdvertising");
+    if (self.peripheral.isAdvertising) [self.peripheral stopAdvertising];
+
+    NSDictionary *advertisment = @{
+                                   CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:@"1E960C29-5247-44E7-BEEE-A91FBC21454F"]],
+                                   CBAdvertisementDataLocalNameKey: @"AirlockPeripheral"
+                                   };
+    [self.peripheral startAdvertising:advertisment];
+}
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral
+            didAddService:(CBService *)service
+                    error:(NSError *)error {
+    [self startAdvertising];
 }
 
 @end

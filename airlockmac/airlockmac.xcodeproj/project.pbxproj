@@ -35,6 +35,7 @@
 		F647AA1E183A746100CAA7BF /* ALAirlockService.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA1D183A746100CAA7BF /* ALAirlockService.m */; };
 		F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */; };
 		F647AA27183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */; };
+		F647AA29183B6AF400CAA7BF /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 		F647AA23183A79CB00CAA7BF /* ALLoginscreenOverlayWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALLoginscreenOverlayWindowController.h; sourceTree = "<group>"; };
 		F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALLoginscreenOverlayWindowController.m; sourceTree = "<group>"; };
 		F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ALLoginscreenOverlayWindowController.xib; sourceTree = "<group>"; };
+		F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = System/Library/Frameworks/IOBluetooth.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F647AA29183B6AF400CAA7BF /* IOBluetooth.framework in Frameworks */,
 				F647AA19183A5BC100CAA7BF /* CoreFoundation.framework in Frameworks */,
 				F647AA18183A5BB600CAA7BF /* IOKit.framework in Frameworks */,
 				4D84C01B1833D1D100F3D2D9 /* Cocoa.framework in Frameworks */,
@@ -156,6 +159,7 @@
 		4D84C0191833D1D100F3D2D9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */,
 				F647AA17183A5BB600CAA7BF /* IOKit.framework */,
 				4D84C01A1833D1D100F3D2D9 /* Cocoa.framework */,
 				4D84C03C1833D1D100F3D2D9 /* XCTest.framework */,

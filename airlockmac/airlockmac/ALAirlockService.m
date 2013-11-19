@@ -10,11 +10,15 @@
 #import "ALAppDelegate.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
+#import <IOBluetooth/IOBluetooth.h>
 
-@interface ALAirlockService () {}
+@interface ALAirlockService () <CBCentralManagerDelegate, CBPeripheralDelegate> {}
 @property BOOL loginwindowIsFrontmostApplication;
 @property BOOL screenIsSleeping;
 @property (strong, nonatomic) NSTimer *watchFrontmostApplicationTimer;
+@property (strong, nonatomic) CBCentralManager *centralManager;
+@property (strong, nonatomic) CBPeripheral *connectedPeripheral;
+
 @end
 
 @implementation ALAirlockService
@@ -38,6 +42,7 @@
     if (self) {
         self.loginwindowIsFrontmostApplication = NO;
         self.screenIsSleeping = YES;
+        self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()]; // TODO use another queue?
     }
     return self;
 }
@@ -179,6 +184,66 @@
     [resetDelayTask setArguments:arguments];
     [resetDelayTask setLaunchPath: @"/usr/bin/defaults"];
     [resetDelayTask launch];
+}
+
+#pragma mark - BlueTooth Central
+
+- (void)monitorForDevice
+{
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn) {
+        NSLog(@"Defer scanning until manager comes online");
+        return;
+    }
+
+    NSDictionary *scanningOptions = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @NO };
+    [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:@"1E960C29-5247-44E7-BEEE-A91FBC21454F"]]
+                                    options:scanningOptions];
+}
+
+- (void)centralManagerDidUpdateState:(CBCentralManager *)central
+{
+    NSLog(@"centralManagerDidUpdateState: state %ld", central.state);
+    if (central.state == CBCentralManagerStatePoweredOn) {
+        [self monitorForDevice];
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central
+ didDiscoverPeripheral:(CBPeripheral *)peripheral
+     advertisementData:(NSDictionary *)advertisementData
+                  RSSI:(NSNumber *)RSSI
+{
+    NSLog(@"didDiscoverPeripheral: -------------------------------------------------");
+    NSLog(@"didDiscoverPeripheral: Peripheral identifier: %@ %@ %@", peripheral.identifier, peripheral.name, RSSI);
+    NSLog(@"%@", advertisementData);
+    
+    /*
+    if ([peripheral.identifier isEqualTo:[[NSUUID alloc] initWithUUIDString:@"125647CD-F0EF-4ECF-A9B2-2CC1E323B158"]]) {
+        [self.manager stopScan];
+        self.connectedPeripheral = peripheral;
+        NSLog(@"connect %@", peripheral);
+        [self.manager connectPeripheral:self.connectedPeripheral options:nil];
+    }
+     */
+}
+
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
+{
+    NSLog(@"didConnectPeripheral: Peripheral identifier: %@", peripheral.identifier);
+    peripheral.delegate = self;
+    [peripheral discoverServices:nil];
+}
+
+- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    NSLog(@"didFailToConnectPeripheral %@", error);
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
+{
+    for (CBService *service in peripheral.services) {
+        NSLog(@"Service: %@", service.UUID);
+    }
 }
 
 #pragma mark -

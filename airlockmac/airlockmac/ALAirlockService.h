@@ -19,4 +19,6 @@
 - (void)loginUser;
 - (void)lockScreen;
 
+- (void)monitorForDevice;
+
 @end

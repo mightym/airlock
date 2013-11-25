@@ -14,6 +14,7 @@
 @property (strong, nonatomic) ALLoginscreenOverlayWindowController* loginOverlay;
 @property (strong, nonatomic) IBOutlet NSSecureTextField* passwordField;
 @property (strong, nonatomic) IBOutlet NSSegmentedControl* ibeaconControl;
+@property (strong, nonatomic) IBOutlet NSSegmentedControl* peripheralControl;
 @end
 
 @implementation ALAppDelegate
@@ -30,7 +31,7 @@
     [statusItem setHighlightMode:YES];
     
     self.ibeaconControl.selectedSegment = 0;
-    
+    self.peripheralControl.selectedSegment = 0;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -76,9 +77,19 @@
 {
     NSSegmentedControl* control = (NSSegmentedControl*)sender;
     if (control.selectedSegment == 1) {
-        [self startAdvertiseIBeacon];
+        [[ALAirlockService sharedService] startAdvertiseAsiBeacon];
     } {
-        [self stopAdvertiseIBeacon];
+        [[ALAirlockService sharedService] stopAdvertiseAsiBeacon];
+    }
+}
+
+- (IBAction)switchPeripheral:(id)sender
+{
+    NSSegmentedControl* control = (NSSegmentedControl*)sender;
+    if (control.selectedSegment == 1) {
+        [[ALAirlockService sharedService] startAdvertiseAsPeripheral];
+    } {
+        [[ALAirlockService sharedService] stopAdvertiseAsPeripheral];
     }
 }
 
@@ -91,14 +102,5 @@
 
 #pragma mark -
 
-- (void)startAdvertiseIBeacon
-{
-    [[ALAirlockService sharedService] advertiseAsiBeacon];
-}
-
-- (void)stopAdvertiseIBeacon
-{
-    [[ALAirlockService sharedService] stopAdvertiseAsiBeacon];
-}
 
 @end

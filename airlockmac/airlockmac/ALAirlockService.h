@@ -19,9 +19,10 @@
 - (void)loginUser;
 - (void)lockScreen;
 
-- (void)monitorForDevice;
-
-- (void)advertiseAsiBeacon;
+- (void)startAdvertiseAsiBeacon;
 - (void)stopAdvertiseAsiBeacon;
+
+- (void)startAdvertiseAsPeripheral;
+- (void)stopAdvertiseAsPeripheral;
 
 @end

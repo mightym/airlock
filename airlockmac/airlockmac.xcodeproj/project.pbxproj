@@ -36,6 +36,7 @@
 		F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */; };
 		F647AA27183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */; };
 		F647AA29183B6AF400CAA7BF /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */; };
+		F647AA2E183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA2D183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +99,8 @@
 		F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALLoginscreenOverlayWindowController.m; sourceTree = "<group>"; };
 		F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ALLoginscreenOverlayWindowController.xib; sourceTree = "<group>"; };
 		F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = System/Library/Frameworks/IOBluetooth.framework; sourceTree = SDKROOT; };
+		F647AA2C183B8DF300CAA7BF /* BLCBeaconAdvertisementData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLCBeaconAdvertisementData.h; sourceTree = "<group>"; };
+		F647AA2D183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLCBeaconAdvertisementData.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +199,8 @@
 				F647AA23183A79CB00CAA7BF /* ALLoginscreenOverlayWindowController.h */,
 				F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */,
 				F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */,
+				F647AA2C183B8DF300CAA7BF /* BLCBeaconAdvertisementData.h */,
+				F647AA2D183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m */,
 			);
 			path = airlockmac;
 			sourceTree = "<group>";
@@ -406,6 +411,7 @@
 				4D84C0271833D1D100F3D2D9 /* main.m in Sources */,
 				4D84C02E1833D1D100F3D2D9 /* ALAppDelegate.m in Sources */,
 				F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */,
+				F647AA2E183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

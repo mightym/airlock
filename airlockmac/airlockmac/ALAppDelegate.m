@@ -218,6 +218,8 @@
     }];
     
     [[ALAirlockService sharedService] startMonitoring];
+    [[ALAirlockService sharedService] monitorForDevice];
+    [[ALAirlockService sharedService] advertiseAsiBeacon];
 }
 
 #pragma mark - Interface Actions

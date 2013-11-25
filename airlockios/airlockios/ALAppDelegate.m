@@ -8,13 +8,16 @@
 
 #import "ALAppDelegate.h"
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <CoreLocation/CoreLocation.h>
 
 
-@interface ALAppDelegate () <CBPeripheralManagerDelegate> {}
+@interface ALAppDelegate () <CBPeripheralManagerDelegate, CBPeripheralDelegate, CLLocationManagerDelegate> {}
 
-@property(nonatomic, strong) CBPeripheralManager *peripheral;
-@property(nonatomic, strong) CBMutableCharacteristic *characteristic;
+@property(nonatomic, strong) CBPeripheralManager *peripheralManager;
 @property(nonatomic, strong) CBMutableService *service;
+
+@property (strong, nonatomic) CLBeaconRegion *beaconRegion;
+@property (strong, nonatomic) CLLocationManager *locationManager;
 
 @end
 
@@ -23,7 +26,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    [self setupBluetooth];
+    [self monitorMacBeacon];
     return YES;
 }
 							
@@ -55,58 +58,116 @@
 }
 
 #pragma mark -
-- (void)setupBluetooth
+
+- (void)monitorMacBeacon
 {
-    self.peripheral = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    [self initRegion];
+    
+    [self locationManager:self.locationManager didStartMonitoringForRegion:self.beaconRegion];
 }
 
-- (void)enableService
+- (void)initRegion
 {
-    NSLog(@"enableService");
-    if (self.service) {
-        [self.peripheral removeService:self.service];
-    }
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"E3DAFC96-5094-4EB9-ADFD-A3A978C8AC19"];
+    self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid identifier:@"air"];
+    [self.locationManager startMonitoringForRegion:self.beaconRegion];
+}
 
-    self.service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"1E960C29-5247-44E7-BEEE-A91FBC21454F"]
-                                                  primary:YES];
-    
-    self.characteristic = [[CBMutableCharacteristic alloc]
-                           initWithType:[CBUUID UUIDWithString:@"2ABFE74D-52E2-47FD-A574-B7FECB3EE8AF"]
-                           properties:CBCharacteristicPropertyNotify
-                           value:nil
-                           permissions:0];
-    
-    // Assign the characteristic.
-    self.service.characteristics = [NSArray arrayWithObject:self.characteristic];
-    
-    // Add the service to the peripheral manager.
-    [self.peripheral addService:self.service];
+- (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    [self.locationManager startRangingBeaconsInRegion:self.beaconRegion];
+}
+
+-(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    [self.locationManager stopRangingBeaconsInRegion:self.beaconRegion];
+}
+
+-(void)locationManager:(CLLocationManager *)manager didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    CLBeacon *beacon = [[CLBeacon alloc] init];
+    beacon = [beacons lastObject];
+
+    if (beacon.proximity == CLProximityUnknown) {
+        NSLog(@"Unknown Proximity");
+        [self cancelAdvertiseIOSPeripheral];
+    } else if (beacon.proximity == CLProximityImmediate) {
+        NSLog(@"Immediate");
+        [self advertiseIOSPeripheral];
+    } else if (beacon.proximity == CLProximityNear) {
+        NSLog(@"Near");
+        [self cancelAdvertiseIOSPeripheral];
+    } else if (beacon.proximity == CLProximityFar) {
+        NSLog(@"Far");
+        [self cancelAdvertiseIOSPeripheral];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    [self.locationManager startRangingBeaconsInRegion:self.beaconRegion];
+}
+
+- (void)cancelAdvertiseIOSPeripheral
+{
+    [self.peripheralManager removeService:self.service];
+    [self.peripheralManager stopAdvertising];
+}
+
+- (void)advertiseIOSPeripheral
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    if (self.peripheralManager) return;
+    self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
 }
 
 - (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral
 {
-    NSLog(@"peripheralManagerDidUpdateState %ld", peripheral.state);
+    NSLog(@"%s", __PRETTY_FUNCTION__);
     if (peripheral.state == CBPeripheralManagerStatePoweredOn) {
-        [self enableService];
+        [self enablePeripheralService];
     }
 }
 
-- (void)startAdvertising
+- (void)enablePeripheralService
 {
-    NSLog(@"startAdvertising");
-    if (self.peripheral.isAdvertising) [self.peripheral stopAdvertising];
-
-    NSDictionary *advertisment = @{
-                                   CBAdvertisementDataServiceUUIDsKey : @[[CBUUID UUIDWithString:@"1E960C29-5247-44E7-BEEE-A91FBC21454F"]],
-                                   CBAdvertisementDataLocalNameKey: @"AirlockPeripheral"
-                                   };
-    [self.peripheral startAdvertising:advertisment];
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    if (self.service) {
+        [self.peripheralManager removeService:self.service];
+    }
+    
+    self.service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"47FAEEF2-C372-45F7-9E22-BF7A07C22348"]
+                                                  primary:YES];
+    
+    CBMutableCharacteristic *characteristic = [[CBMutableCharacteristic alloc]
+                           initWithType:[CBUUID UUIDWithString:@"7E227EED-5A66-4B6C-94E2-B919B27FB722"]
+                           properties:CBCharacteristicPropertyNotify
+                           value:nil
+                           permissions:CBAttributePermissionsReadable];
+    
+    self.service.characteristics = [NSArray arrayWithObject:characteristic];
+    
+    [self.peripheralManager addService:self.service];
 }
 
-- (void)peripheralManager:(CBPeripheralManager *)peripheral
-            didAddService:(CBService *)service
-                    error:(NSError *)error {
-    [self startAdvertising];
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didAddService:(CBService *)service error:(NSError *)error
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+
+    if (self.peripheralManager.isAdvertising) [self.peripheralManager stopAdvertising];
+    
+    NSDictionary *advertisment = @{
+                                   CBAdvertisementDataLocalNameKey: @"Airlock",
+                                   CBAdvertisementDataServiceUUIDsKey: @[[CBUUID UUIDWithString:@"47FAEEF2-C372-45F7-9E22-BF7A07C22348"]]
+                                   };
+    [self.peripheralManager startAdvertising:advertisment];
 }
 
 @end

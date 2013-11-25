@@ -19,15 +19,8 @@ IBOutlet NSMenu *statusMenu;
 
 @property (assign) IBOutlet NSWindow *window;
 
-@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
-@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
-
-- (IBAction)saveAction:(id)sender;
 - (IBAction)disconnect:(id)sender;
-
 - (IBAction)clickSleepButton:(id)sender;
-
 - (NSString*)userPassword;
 
 @end

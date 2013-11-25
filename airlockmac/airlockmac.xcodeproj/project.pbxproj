@@ -15,7 +15,6 @@
 		4D84C02B1833D1D100F3D2D9 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4D84C0291833D1D100F3D2D9 /* Credits.rtf */; };
 		4D84C02E1833D1D100F3D2D9 /* ALAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C02D1833D1D100F3D2D9 /* ALAppDelegate.m */; };
 		4D84C0311833D1D100F3D2D9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D84C02F1833D1D100F3D2D9 /* MainMenu.xib */; };
-		4D84C0341833D1D100F3D2D9 /* airlockmac.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C0321833D1D100F3D2D9 /* airlockmac.xcdatamodeld */; };
 		4D84C0361833D1D100F3D2D9 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D84C0351833D1D100F3D2D9 /* Images.xcassets */; };
 		4D84C03D1833D1D100F3D2D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D84C03C1833D1D100F3D2D9 /* XCTest.framework */; };
 		4D84C03E1833D1D100F3D2D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D84C01A1833D1D100F3D2D9 /* Cocoa.framework */; };
@@ -72,7 +71,6 @@
 		4D84C02C1833D1D100F3D2D9 /* ALAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALAppDelegate.h; sourceTree = "<group>"; };
 		4D84C02D1833D1D100F3D2D9 /* ALAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALAppDelegate.m; sourceTree = "<group>"; };
 		4D84C0301833D1D100F3D2D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		4D84C0331833D1D100F3D2D9 /* airlockmac.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = airlockmac.xcdatamodel; sourceTree = "<group>"; };
 		4D84C0351833D1D100F3D2D9 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D84C03B1833D1D100F3D2D9 /* airlockmacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = airlockmacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D84C03C1833D1D100F3D2D9 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -188,7 +186,6 @@
 		4D84C0201833D1D100F3D2D9 /* airlockmac */ = {
 			isa = PBXGroup;
 			children = (
-				F647AA1B183A73BE00CAA7BF /* Model */,
 				F647AA1A183A73B000CAA7BF /* Assets */,
 				4D84C02C1833D1D100F3D2D9 /* ALAppDelegate.h */,
 				4D84C02D1833D1D100F3D2D9 /* ALAppDelegate.m */,
@@ -266,14 +263,6 @@
 				4D0D4E921835563600D2C238 /* statusIconInverted.tif */,
 			);
 			name = Assets;
-			sourceTree = "<group>";
-		};
-		F647AA1B183A73BE00CAA7BF /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				4D84C0321833D1D100F3D2D9 /* airlockmac.xcdatamodeld */,
-			);
-			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -407,7 +396,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F647AA1E183A746100CAA7BF /* ALAirlockService.m in Sources */,
-				4D84C0341833D1D100F3D2D9 /* airlockmac.xcdatamodeld in Sources */,
 				4D84C0271833D1D100F3D2D9 /* main.m in Sources */,
 				4D84C02E1833D1D100F3D2D9 /* ALAppDelegate.m in Sources */,
 				F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */,
@@ -702,19 +690,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		4D84C0321833D1D100F3D2D9 /* airlockmac.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				4D84C0331833D1D100F3D2D9 /* airlockmac.xcdatamodel */,
-			);
-			currentVersion = 4D84C0331833D1D100F3D2D9 /* airlockmac.xcdatamodel */;
-			path = airlockmac.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 4D84C00F1833D1D100F3D2D9 /* Project object */;
 }

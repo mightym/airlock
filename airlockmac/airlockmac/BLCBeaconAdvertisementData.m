@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Blended Cocoa. All rights reserved.
 //
 
-#import <IOBluetooth/IOBluetooth.h>
 #import "BLCBeaconAdvertisementData.h"
 
 @implementation BLCBeaconAdvertisementData
@@ -42,10 +41,7 @@
     
     NSMutableData *advertisement = [NSMutableData dataWithBytes:advertisementBytes length:21];
     
-    return [NSDictionary dictionaryWithObjectsAndKeys:
-            advertisement, beaconKey,
-            @"1E960C29-5247-44E7-BEEE-A91FBC21454F", @"kCBAdvertisementDataServiceUUIDsKey",
-            nil];
+    return [NSDictionary dictionaryWithObject:advertisement forKey:beaconKey];
 }
 
 @end

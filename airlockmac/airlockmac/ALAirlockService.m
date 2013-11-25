@@ -47,7 +47,7 @@
     if (self) {
         self.loginwindowIsFrontmostApplication = NO;
         self.screenIsSleeping = YES;
-        self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()]; // TODO use another queue?
+//        self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()]; // TODO use another queue?
     }
     return self;
 }
@@ -260,14 +260,23 @@
 - (void)advertiseAsiBeacon
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    [self stopAdvertiseAsiBeacon];
     self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
 }
 
-- (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral
+- (void)stopAdvertiseAsiBeacon
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    if ([self.peripheralManager isAdvertising]) [self.peripheralManager stopAdvertising];
+}
+
+
+- (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral
+{
+    NSLog(@"%s %ld", __PRETTY_FUNCTION__, peripheral.state);
     if (peripheral.state == CBPeripheralManagerStatePoweredOn) {
-        [self enableService];
+//        [self enableService];
+        [self startAdvertising];
     }
 }
 
@@ -285,11 +294,11 @@
         [self.peripheralManager removeService:self.service];
     }
 
-    self.service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"1E960C29-5247-44E7-BEEE-A91FBC21454F"]
+    self.service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"05E23F73-4B0D-4822-BBAD-FC1E00490866"]
                                                   primary:YES];
     
     self.characteristic = [[CBMutableCharacteristic alloc]
-                           initWithType:[CBUUID UUIDWithString:@"2ABFE74D-52E2-47FD-A574-B7FECB3EE8AF"]
+                           initWithType:[CBUUID UUIDWithString:@"097C2277-1290-4AA7-95AA-53E1B6FB7471"]
                            properties:CBCharacteristicPropertyWriteWithoutResponse
                            value:nil
                            permissions:0];
@@ -302,12 +311,12 @@
 - (void)startAdvertising
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:@"E3DAFC96-5094-4EB9-ADFD-A3A978C8AC19"];
+    NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:@"74278BDA-B644-4520-8F0C-720EAF059935"];
     
     BLCBeaconAdvertisementData *beaconData = [[BLCBeaconAdvertisementData alloc] initWithProximityUUID:proximityUUID
-                                                                                                 major:1
-                                                                                                 minor:1
-                                                                                         measuredPower:-58];
+                                                                                                 major:7
+                                                                                                 minor:7031
+                                                                                         measuredPower:-64];
     
     [self.peripheralManager startAdvertising:beaconData.beaconAdvertisement];
 }

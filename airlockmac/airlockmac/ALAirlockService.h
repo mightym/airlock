@@ -20,6 +20,8 @@
 - (void)lockScreen;
 
 - (void)monitorForDevice;
+
 - (void)advertiseAsiBeacon;
+- (void)stopAdvertiseAsiBeacon;
 
 @end

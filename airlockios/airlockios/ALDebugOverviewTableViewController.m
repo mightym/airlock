@@ -185,12 +185,12 @@
 - (void)discoverAirlockOnMac
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:nil];
+    self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_queue_create("com.wirblich.airlock.cb", NULL) options:nil];
 }
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"%s %d", __PRETTY_FUNCTION__, (int)central.state);
     if (central.state == CBCentralManagerStatePoweredOn) {
         [self scanForPeripherals];
     }
@@ -199,8 +199,10 @@
 - (void)scanForPeripherals
 {
     if (self.switchMonitorPeripheral.on) {
-        self.labelStatus.text = @"scan";
-        [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:@"05E23F73-4B0D-4822-BBAD-FC1E00490866"]] options:nil];
+        dispatch_sync(dispatch_get_main_queue(),^{
+            self.labelStatus.text = @"scan";
+        });
+        [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:@"05E23F73-4B0D-4822-BBAD-FC1E00490866"]] options:@{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
     }
 }
 
@@ -213,26 +215,51 @@
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   %@", peripheral.identifier);
-    NSLog(@"   %@", advertisementData);
-    
-    self.labelStatus.text = [NSString stringWithFormat:@"found"];
-    self.labelName.text = [NSString stringWithFormat:@"%@/%@", [advertisementData objectForKey:CBAdvertisementDataLocalNameKey], peripheral.name];
-    self.labelRSSI.text = [NSString stringWithFormat:@"%ld dB", (long)[RSSI integerValue]];
-    
-    self.connectedPeripheral = peripheral;
-    self.connectedPeripheral.delegate = self;
+    NSLog(@"   %@ / %@", peripheral.identifier, peripheral.name);
+    NSLog(@"   %d", [RSSI intValue]);
 
-    [self.centralManager stopScan];
-    [self.centralManager connectPeripheral:self.connectedPeripheral options:nil];
+    if (YES) { // [RSSI intValue] > -65) {
+        BOOL foundAirlockPeripheral = NO;
+        
+        NSArray* advertisedServices = (NSArray*)[advertisementData objectForKey:CBAdvertisementDataServiceUUIDsKey];
+        for (CBUUID* serviceUuid in advertisedServices) {
+            if ([serviceUuid isEqual:[CBUUID UUIDWithString:@"05E23F73-4B0D-4822-BBAD-FC1E00490866"]]) {
+                foundAirlockPeripheral = YES;
+                break;
+            }
+        }
+        
+        if (foundAirlockPeripheral) {
+            [self.centralManager stopScan];
+            UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+            localNotification.alertAction = @"AIRLOCK";
+            localNotification.alertBody = [NSString stringWithFormat:@"discover %@", peripheral.name];
+            localNotification.soundName = UILocalNotificationDefaultSoundName;
+            [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+            
+            dispatch_sync(dispatch_get_main_queue(),^{
+                self.labelStatus.text = [NSString stringWithFormat:@"found"];
+                self.labelName.text = [NSString stringWithFormat:@"%@/%@", [advertisementData objectForKey:CBAdvertisementDataLocalNameKey], peripheral.name];
+                self.labelRSSI.text = [NSString stringWithFormat:@"%ld dB", (long)[RSSI integerValue]];
+            });
+            self.connectedPeripheral = peripheral;
+            self.connectedPeripheral.delegate = self;
+                        
+            [self.centralManager connectPeripheral:self.connectedPeripheral options:nil];
+
+        }
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
-    self.labelStatus.text = [NSString stringWithFormat:@"didDisconnect"];
-    self.labelValue.text = @"";
-    self.labelRSSI.text = @"";
-    self.labelName.text = @"";
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    dispatch_sync(dispatch_get_main_queue(),^{
+        self.labelStatus.text = [NSString stringWithFormat:@"didDisconnect"];
+        self.labelValue.text = @"";
+        self.labelRSSI.text = @"";
+        self.labelName.text = @"";
+    });
     self.connectedPeripheral = nil;
     [self scanForPeripherals];
 }
@@ -255,7 +282,9 @@
     localNotification.soundName = UILocalNotificationDefaultSoundName;
     [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
 
-    self.labelStatus.text = @"discover service";
+    dispatch_sync(dispatch_get_main_queue(),^{
+        self.labelStatus.text = @"discover service";
+    });
     [peripheral discoverServices:@[[CBUUID UUIDWithString:@"05E23F73-4B0D-4822-BBAD-FC1E00490866"]]];
     self.rssiUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateRssiValue:) userInfo:nil repeats:YES];
     self.rssiUpdateTimer.tolerance = 5.0;
@@ -263,7 +292,7 @@
 
 - (void)updateRssiValue:(NSTimer*)timer
 {
-    if (self.connectedPeripheral && self.connectedPeripheral.state == CBPeripheralStateConnected) {
+    if (self.connectedPeripheral && (self.connectedPeripheral.state == CBPeripheralStateConnecting ||  self.connectedPeripheral.state == CBPeripheralStateConnected)) {
         [self.connectedPeripheral readRSSI];
     } else {
         [self.rssiUpdateTimer invalidate];
@@ -273,7 +302,9 @@
 
 - (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
 {
-    self.labelRSSI.text = [NSString stringWithFormat:@"%ld dB", (long)[peripheral.RSSI integerValue]];
+    dispatch_sync(dispatch_get_main_queue(),^{
+        self.labelRSSI.text = [NSString stringWithFormat:@"%ld dB", (long)[peripheral.RSSI integerValue]];
+    });
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
@@ -287,8 +318,10 @@
             service = availableService;
         }
     }
-    self.labelStatus.text = @"discover Characteristics";
-    [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:@"5CFE303E-501A-4C83-AF66-332999CD80F2"]] forService:service];
+    dispatch_sync(dispatch_get_main_queue(),^{
+        self.labelStatus.text = @"discover Characteristics";
+    });
+    [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]] forService:service];
 
 }
 
@@ -296,15 +329,22 @@
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     NSLog(@"   %@", service.characteristics);
-    self.labelStatus.text = @"read";
-    [peripheral readValueForCharacteristic:service.characteristics.lastObject];
+    dispatch_sync(dispatch_get_main_queue(),^{
+        self.labelStatus.text = @"read";
+    });
+    if (service.characteristics.count > 0) {
+        NSLog(@"service.characteristics %@", service.characteristics);
+        [peripheral readValueForCharacteristic:service.characteristics.lastObject];
+    }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    self.labelStatus.text = @"ready";
-    self.labelValue.text = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+    dispatch_sync(dispatch_get_main_queue(),^{
+        self.labelStatus.text = @"ready";
+        self.labelValue.text = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+    });
 }
 
 

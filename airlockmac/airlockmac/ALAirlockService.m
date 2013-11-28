@@ -246,13 +246,36 @@
                                                                                       value:[@"foobar" dataUsingEncoding:NSUTF8StringEncoding]
                                                                                 permissions:CBAttributePermissionsReadable];
     
-
+    
+    
+    CBMutableCharacteristic* characteristic1 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]
+                                                                                 properties:CBCharacteristicPropertyRead
+                                                                                      value:nil
+                                                                                permissions:CBAttributePermissionsReadable];
+    
+    
+    CBMutableCharacteristic* characteristic2 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"F96637CA-7336-4F15-9D6E-B13A896C95E7"]
+                                                                                  properties:CBCharacteristicPropertyWrite
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsWriteable];
+    
+    CBMutableCharacteristic* characteristic3 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"F310D252-5E00-4DF9-BAE8-459FB63743D2"]
+                                                                                  properties:CBCharacteristicPropertyWrite
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsWriteEncryptionRequired];
+    
+    CBMutableCharacteristic* characteristic4 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"15D80DE8-B700-42FF-AB00-4FA6258EBCBA"]
+                                                                                  properties:CBCharacteristicPropertyWriteWithoutResponse
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsWriteable];
+    
     CBMutableService* service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"05E23F73-4B0D-4822-BBAD-FC1E00490866"]
                                                                primary:YES];
-    service.characteristics = @[characteristic];
+    service.characteristics = @[characteristic, characteristic1, characteristic2, characteristic3, characteristic4];
     
     self.service = service;
     
+    if (self.peripheralManager.isAdvertising) [self.peripheralManager stopAdvertising];
     [self.peripheralManager removeAllServices];
     [self.peripheralManager addService:self.service];
 }
@@ -266,7 +289,6 @@
                                                                                                  major:7
                                                                                                  minor:7031
                                                                                          measuredPower:-64];
-    
     [self.peripheralManager startAdvertising:beaconData.beaconAdvertisement];
 }
 
@@ -293,6 +315,34 @@
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     NSLog(@"  %@", request.central.identifier);
+    
+    [peripheral respondToRequest:request withResult:CBATTErrorInsufficientAuthentication];
+    return;
+    
+    if ([request.characteristic.UUID isEqual:[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]]) {
+        
+        NSData *value = [[[NSDate date] description] dataUsingEncoding:NSUTF8StringEncoding];
+        if (request.offset > value.length) {
+            [peripheral respondToRequest:request withResult:CBATTErrorInvalidOffset];
+            return;
+        }
+
+        request.value = [value subdataWithRange:NSMakeRange(request.offset, MIN(value.length - request.offset, 20))];
+        [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
+        return;
+    }
+    
+    [peripheral respondToRequest:request withResult:CBATTErrorRequestNotSupported];
+    
+    return;
+}
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray *)requests
+{
+    for (CBATTRequest* request in requests) {
+        NSLog(@"request.value: %@ (for %@)", [[NSString alloc] initWithData:request.value encoding:NSUTF8StringEncoding], request.characteristic.UUID);
+        [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
+    }
 }
 
 #pragma mark -

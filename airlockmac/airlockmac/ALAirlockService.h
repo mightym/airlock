@@ -25,4 +25,7 @@
 - (void)startAdvertiseAsPeripheral;
 - (void)stopAdvertiseAsPeripheral;
 
+- (void)discoverAirlockOnIOS;
+- (void)stopDiscoverAirlockOnIOS;
+
 @end

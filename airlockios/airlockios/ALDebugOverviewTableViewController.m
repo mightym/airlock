@@ -10,7 +10,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 
-@interface ALDebugOverviewTableViewController () <CLLocationManagerDelegate, CBCentralManagerDelegate, CBPeripheralDelegate>
+@interface ALDebugOverviewTableViewController () <CLLocationManagerDelegate, CBCentralManagerDelegate, CBPeripheralDelegate, CBPeripheralManagerDelegate>
 
 @property (nonatomic, strong) IBOutlet UISwitch* switchMonitorIbeacon;
 @property (nonatomic, strong) IBOutlet UILabel* labelInRange;
@@ -26,6 +26,11 @@
 @property (nonatomic, strong) IBOutlet UILabel* labelRSSI;
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) CBPeripheral *connectedPeripheral;
+
+@property (nonatomic, strong) IBOutlet UISwitch* switchAdvertisePeripheral;
+@property (strong, nonatomic) CBPeripheralManager *peripheralManager;
+@property (strong, nonatomic) CBMutableCharacteristic *characteristic;
+@property (strong, nonatomic) CBMutableService *service;
 
 @property (nonatomic) NSTimer* rssiUpdateTimer;
 @property (nonatomic) CLProximity lastBeaconProximity;
@@ -67,6 +72,16 @@
         
     } else {
         [self discoverAirlockOnMac];
+    }
+}
+
+- (IBAction)switchAdvertisePeripheral:(id)sender
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    if (self.switchAdvertisePeripheral.on) {
+        [self startAdvertiseAsPeripheral];
+    } else {
+        [self stopAdvertiseAsPeripheral];
     }
 }
 
@@ -347,6 +362,131 @@
     });
 }
 
+
+
+#pragma mark - BlueTooth Periperal
+
+- (void)startAdvertiseAsPeripheral
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    [self stopAdvertiseAsPeripheral];
+    self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
+}
+
+- (void)stopAdvertiseAsPeripheral
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    if ([self.peripheralManager isAdvertising]) [self.peripheralManager stopAdvertising];
+}
+
+
+- (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral
+{
+    NSLog(@"%s %ld", __PRETTY_FUNCTION__, peripheral.state);
+    if (peripheral.state == CBPeripheralManagerStatePoweredOn) {
+        if (peripheral == self.peripheralManager) {
+            [self enablePeripheralService];
+        }
+    }
+}
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didAddService:(CBService *)service error:(NSError *)error {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    [self startAdvertisingPeripheral];
+}
+
+- (void)enablePeripheralService
+{
+    
+    CBMutableCharacteristic* characteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"5CFE303E-501A-4C83-AF66-332999CD80F2"]
+                                                                                 properties:CBCharacteristicPropertyRead
+                                                                                      value:[@"foobar" dataUsingEncoding:NSUTF8StringEncoding]
+                                                                                permissions:CBAttributePermissionsReadable];
+    
+    CBMutableCharacteristic* characteristic1 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]
+                                                                                  properties:CBCharacteristicPropertyRead
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsReadable];
+    
+    CBMutableCharacteristic* characteristic2 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"F96637CA-7336-4F15-9D6E-B13A896C95E7"]
+                                                                                  properties:CBCharacteristicPropertyWrite
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsWriteable];
+    
+    CBMutableCharacteristic* characteristic3 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"F310D252-5E00-4DF9-BAE8-459FB63743D2"]
+                                                                                  properties:CBCharacteristicPropertyWrite
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsWriteEncryptionRequired];
+    
+    CBMutableCharacteristic* characteristic4 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:@"15D80DE8-B700-42FF-AB00-4FA6258EBCBA"]
+                                                                                  properties:CBCharacteristicPropertyWriteWithoutResponse
+                                                                                       value:nil
+                                                                                 permissions:CBAttributePermissionsWriteable];
+    
+    CBMutableService* service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:@"0A8446F2-93EA-4587-8AC1-CC24B3D9BA2E"]
+                                                               primary:YES];
+    service.characteristics = @[characteristic, characteristic1, characteristic2, characteristic3, characteristic4];
+    
+    self.service = service;
+    
+    if (self.peripheralManager.isAdvertising) [self.peripheralManager stopAdvertising];
+    [self.peripheralManager removeAllServices];
+    [self.peripheralManager addService:self.service];
+}
+
+- (void)startAdvertisingPeripheral {
+    [self.peripheralManager startAdvertising:@{
+                                               CBAdvertisementDataLocalNameKey: @"airlockIOS",
+                                               CBAdvertisementDataServiceUUIDsKey: @[[CBUUID UUIDWithString:@"0A8446F2-93EA-4587-8AC1-CC24B3D9BA2E"]]
+                                               }];
+}
+
+- (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheral error:(NSError *)error
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    if (error) NSLog(@"%@", error);
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"%@", characteristic.value);
+}
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveReadRequest:(CBATTRequest *)request
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"  %@", request.central.identifier);
+    
+    
+    if ([request.characteristic.UUID isEqual:[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]]) {
+        
+        NSData *value = [[[NSDate date] description] dataUsingEncoding:NSUTF8StringEncoding];
+        if (request.offset > value.length) {
+            [peripheral respondToRequest:request withResult:CBATTErrorInvalidOffset];
+            return;
+        }
+        
+        request.value = [value subdataWithRange:NSMakeRange(request.offset, MIN(value.length - request.offset, 20))];
+        [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
+//    [peripheral respondToRequest:request withResult:CBATTErrorInsufficientAuthentication];
+        return;
+    }
+    
+    [peripheral respondToRequest:request withResult:CBATTErrorRequestNotSupported];
+    
+    return;
+}
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray *)requests
+{
+    for (CBATTRequest* request in requests) {
+        NSLog(@"request.value: %@ (for %@)", [[NSString alloc] initWithData:request.value encoding:NSUTF8StringEncoding], request.characteristic.UUID);
+        [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
+    }
+}
+
+#pragma mark -
 
 # pragma mark -
 

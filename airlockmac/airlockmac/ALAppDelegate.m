@@ -15,6 +15,7 @@
 @property (strong, nonatomic) IBOutlet NSSecureTextField* passwordField;
 @property (strong, nonatomic) IBOutlet NSSegmentedControl* ibeaconControl;
 @property (strong, nonatomic) IBOutlet NSSegmentedControl* peripheralControl;
+@property (strong, nonatomic) IBOutlet NSSegmentedControl* discoverControl;
 @end
 
 @implementation ALAppDelegate
@@ -32,6 +33,7 @@
     
     self.ibeaconControl.selectedSegment = 0;
     self.peripheralControl.selectedSegment = 0;
+    self.discoverControl.selectedSegment = 0;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -90,6 +92,16 @@
         [[ALAirlockService sharedService] startAdvertiseAsPeripheral];
     } {
         [[ALAirlockService sharedService] stopAdvertiseAsPeripheral];
+    }
+}
+
+- (IBAction)switchDiscover:(id)sender
+{
+    NSSegmentedControl* control = (NSSegmentedControl*)sender;
+    if (control.selectedSegment == 1) {
+        [[ALAirlockService sharedService] discoverAirlockOnIOS];
+    } {
+        [[ALAirlockService sharedService] stopDiscoverAirlockOnIOS];
     }
 }
 

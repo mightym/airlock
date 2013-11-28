@@ -201,6 +201,34 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Advertise peripheral" id="eIr-gy-nSf">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="bUu-By-1er">
+                                        <rect key="frame" x="0.0" y="418" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bUu-By-1er" id="dGb-bJ-knY">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="advertise peripheral" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j0M-ug-U4h">
+                                                    <rect key="frame" x="20" y="11" width="152" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ztw-9k-gVI">
+                                                    <rect key="frame" x="251" y="6" width="51" height="31"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <connections>
+                                                        <action selector="switchAdvertisePeripheral:" destination="3tV-8Z-shA" eventType="valueChanged" id="Mc0-8A-anQ"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                         </sections>
                         <connections>
                             <outlet property="dataSource" destination="3tV-8Z-shA" id="S8m-xt-LFL"/>
@@ -214,6 +242,7 @@
                         <outlet property="labelRSSI" destination="dtZ-hQ-L2J" id="RI8-0C-ibx"/>
                         <outlet property="labelStatus" destination="M0m-JL-9zU" id="swS-uC-L5W"/>
                         <outlet property="labelValue" destination="Uwy-iJ-GZK" id="Ziy-oy-B44"/>
+                        <outlet property="switchAdvertisePeripheral" destination="ztw-9k-gVI" id="4Qk-BK-wZp"/>
                         <outlet property="switchMonitorIbeacon" destination="hRk-Vx-0iD" id="M9f-mJ-CRU"/>
                         <outlet property="switchMonitorPeripheral" destination="5MW-ul-5Xf" id="SIe-ct-GBi"/>
                     </connections>

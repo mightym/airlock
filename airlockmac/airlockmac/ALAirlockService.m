@@ -25,7 +25,9 @@
 
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) CBPeripheral *connectedPeripheral;
+@property (strong, nonatomic) NSMutableArray *connectedPeripherals;
 @property (nonatomic) NSTimer* rssiUpdateTimer;
+@property BOOL isScanning;
 
 @end
 
@@ -50,8 +52,17 @@
     if (self) {
         self.loginwindowIsFrontmostApplication = NO;
         self.screenIsSleeping = YES;
+        self.isScanning = NO;
     }
     return self;
+}
+
+# pragma mark - say
+- (void)say:(NSString*)words
+{
+    [[[NSAppleScript alloc] initWithSource:
+      [NSString stringWithFormat:@"say \"%@\"", words]]
+     executeAndReturnError:nil];
 }
 
 #pragma mark - Monitoring
@@ -359,7 +370,10 @@
 
 - (void)stopDiscoverAirlockOnIOS
 {
-    if (self.centralManager.state == CBCentralManagerStatePoweredOn) [self.centralManager stopScan];
+    if (self.centralManager.state == CBCentralManagerStatePoweredOn) {
+        [self.centralManager stopScan];
+        self.isScanning = NO;
+    }
     if (self.connectedPeripheral) {
         [self.centralManager cancelPeripheralConnection:self.connectedPeripheral];
     }
@@ -375,94 +389,97 @@
 
 - (void)scanForPeripherals
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-//    [self.centralManager scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:@"0A8446F2-93EA-4587-8AC1-CC24B3D9BA2E"]] options:@{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
-    [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
-}
+    if (self.isScanning) return;
+    self.isScanning = YES;
 
-- (void)centralManager:(CBCentralManager *)central didRetrievePeripherals:(NSArray *)peripherals
-{
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   %@", peripherals);
+    NSArray* serviceUUIDs = @[[CBUUID UUIDWithString:@"0A8446F2-93EA-4587-8AC1-CC24B3D9BA2E"]];
+    NSArray* peripherals = [self.centralManager retrieveConnectedPeripheralsWithServices:serviceUUIDs];
+    NSLog(@"ConnectedPeripherals %@", peripherals);
+    
+    if (peripherals.count > 0) {
+        [self.centralManager connectPeripheral:peripherals.lastObject options:nil];
+        return;
+    }
+    
+    NSString* identifierString = [[NSUserDefaults standardUserDefaults] stringForKey:@"connectedPeripheralIdentifier"];
+    if (identifierString) {
+        NSUUID* identifier = [[NSUUID UUID] initWithUUIDString:identifierString];
+        peripherals = [self.centralManager retrievePeripheralsWithIdentifiers:@[identifier]];
+        NSLog(@"PeripheralsWithIdentifier %@ %@", identifier, peripherals);
+    
+        if (peripherals.count > 0) {
+            [self.centralManager connectPeripheral:peripherals.lastObject options:nil];
+            return;
+        }
+    }
+
+    self.connectedPeripherals = [NSMutableArray array];
+    [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
 }
 
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   %@ / %@", peripheral.identifier, peripheral.name);
-//    NSLog(@"   %d", [RSSI intValue]);
+    NSString *reasonToIgnore = @"-";
+    if ([self.connectedPeripherals containsObject:peripheral]) {
+        reasonToIgnore = @"already connecting";
+    }
+    else if (peripheral.state == CBPeripheralStateConnected) {
+        reasonToIgnore = @"connected";
+    }
+    else if (peripheral.state == CBPeripheralStateConnecting) {
+        reasonToIgnore = @"connecting";
+    }
+    else if ([RSSI intValue] <= -65) {
+        reasonToIgnore = @"too far away";
+    }
+    else if ([peripheral.name isEqualToString:@"estimote"]) {
+        reasonToIgnore = @"ignore estimotes";
+    }
     
-    if (YES) { // [RSSI intValue] > -65) {
-        BOOL foundAirlockPeripheral = NO;
-        
-        NSArray* advertisedServices = (NSArray*)[advertisementData objectForKey:CBAdvertisementDataServiceUUIDsKey];
-        for (CBUUID* serviceUuid in advertisedServices) {
-            NSLog(@"%@", serviceUuid);
-            if ([serviceUuid isEqual:[CBUUID UUIDWithString:@"0A8446F2-93EA-4587-8AC1-CC24B3D9BA2E"]]) {
-                foundAirlockPeripheral = YES;
-                break;
-            }
-        }
-        
-        if (foundAirlockPeripheral) {
-            [self.centralManager stopScan];
-            
-            NSLog(@"%@", [NSString stringWithFormat:@"%@/%@", [advertisementData objectForKey:CBAdvertisementDataLocalNameKey], peripheral.name]);
-            NSLog(@"%@", [NSString stringWithFormat:@"%ld dB", (long)[RSSI integerValue]]);
-            self.connectedPeripheral = peripheral;
-            self.connectedPeripheral.delegate = self;
-            
-            [self.centralManager connectPeripheral:self.connectedPeripheral options:nil];
-            
-        }
+    NSLog(@"discover: %@ / %@ / %ld / %d   (%@)", peripheral.identifier, peripheral.name, peripheral.state, [RSSI intValue], reasonToIgnore);
+
+    if (peripheral.state == CBPeripheralStateDisconnected
+        && ![self.connectedPeripherals containsObject:peripheral]
+        && [RSSI intValue] > -65
+        && ![peripheral.name isEqualToString:@"estimote"]) {
+
+        NSLog(@"%s    %@ / %@ / %d", __PRETTY_FUNCTION__, peripheral.identifier, peripheral.name, [RSSI intValue]);
+        peripheral.delegate = self;
+        [self.connectedPeripherals addObject:peripheral];
+        [self.centralManager connectPeripheral:peripheral options:@{CBConnectPeripheralOptionNotifyOnDisconnectionKey: @YES}];
     }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    self.connectedPeripheral = nil;
-    [self scanForPeripherals];
+    NSLog(@"%s  %@ %@", __PRETTY_FUNCTION__, error, peripheral);
+    [self say:@"disconnect"];
+    [self.connectedPeripherals removeObject:peripheral];
+    if (self.connectedPeripherals.count == 0) {
+        [self centralManagerDidUpdateState:self.centralManager];
+    }
 }
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     NSLog(@"   %@", error);
-    [self scanForPeripherals];
+    [self say:@"failed"];
+    [self.connectedPeripherals removeObject:peripheral];
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   %@", peripheral.identifier);
-    
+    NSLog(@"   %@", peripheral);
+    [self say:@"connect"];
     [peripheral discoverServices:@[[CBUUID UUIDWithString:@"0A8446F2-93EA-4587-8AC1-CC24B3D9BA2E"]]];
-/*
-    self.rssiUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateRssiValue:) userInfo:nil repeats:YES];
-    self.rssiUpdateTimer.tolerance = 5.0;
- */
-}
-
-- (void)updateRssiValue:(NSTimer*)timer
-{
-    if (self.connectedPeripheral && (self.connectedPeripheral.state == CBPeripheralStateConnecting ||  self.connectedPeripheral.state == CBPeripheralStateConnected)) {
-        [self.connectedPeripheral readRSSI];
-    } else {
-        [self.rssiUpdateTimer invalidate];
-        self.rssiUpdateTimer = nil;
-    }
-}
-
-- (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
-{
-    NSLog(@"%@", [NSString stringWithFormat:@"%ld dB", (long)[peripheral.RSSI integerValue]]);
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   %@", peripheral.services);
     
     CBService* service;
     for (CBService* availableService in peripheral.services) {
@@ -470,17 +487,73 @@
             service = availableService;
         }
     }
-    if (service != nil)
-        [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]] forService:service];
+    if (service != nil) {
+        [self say:@"ready"];
+        NSLog(@"   peripheral  %@", peripheral);
+        NSLog(@"   service     %@", service);
+        [self.centralManager stopScan];
+        self.isScanning = NO;
+        self.connectedPeripheral = peripheral;
+        for (CBPeripheral* connectedPeripheral in self.connectedPeripherals) {
+            if (![self.connectedPeripheral isEqualTo:connectedPeripheral]) {
+                [self.centralManager cancelPeripheralConnection:connectedPeripheral];
+            }
+        }
+        self.rssiUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateRssiValue:) userInfo:nil repeats:YES];
+        self.rssiUpdateTimer.tolerance = 1.0;
+
+        [peripheral discoverCharacteristics:nil forService:service];
+//         [peripheral discoverCharacteristics:@[[CBUUID UUIDWithString:@"5CFE303E-501A-4C83-AF66-332999CD80F2"]] forService:service];
+    }
     
+}
+
+
+- (void)updateRssiValue:(NSTimer*)timer
+{
+    if (self.connectedPeripheral
+        && (self.connectedPeripheral.state == CBPeripheralStateConnecting
+            || self.connectedPeripheral.state == CBPeripheralStateConnected)) {
+            [self.connectedPeripheral readRSSI];
+        } else {
+            [self.rssiUpdateTimer invalidate];
+            self.rssiUpdateTimer = nil;
+        }
+}
+
+- (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    NSLog(@"%@", [NSString stringWithFormat:@"%ld dB", (long)[peripheral.RSSI integerValue]]);
+    
+    if ([peripheral.RSSI intValue] <= -75) {
+        [self say:@"away"];
+        NSLog(@"peripheral too far away");
+        [self.rssiUpdateTimer invalidate];
+        self.rssiUpdateTimer = nil;
+        [self.centralManager cancelPeripheralConnection:peripheral];
+        [self.connectedPeripherals removeObject:peripheral];
+        if (self.connectedPeripherals.count == 0) {
+            [self centralManagerDidUpdateState:self.centralManager];
+        }
+    }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"  service %@", service);
     NSLog(@"   %@", service.characteristics);
+
     if (service.characteristics.count > 0) {
-        [peripheral readValueForCharacteristic:service.characteristics.lastObject];
+        CBCharacteristic* characteristic;
+        for (CBCharacteristic* availableCharacteristic in service.characteristics) {
+            if ([availableCharacteristic.UUID isEqual:[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]]) {
+                characteristic = availableCharacteristic;
+            }
+        }
+        if (characteristic != nil) {
+            [peripheral readValueForCharacteristic:characteristic];
+        }
     }
 }
 

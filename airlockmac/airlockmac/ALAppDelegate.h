@@ -11,9 +11,9 @@
 @interface ALAppDelegate : NSObject <NSApplicationDelegate> {
 
 IBOutlet NSMenu *statusMenu;
-    NSStatusItem *statusItem;
-    NSImage *statusImage;
-    NSImage *statusHighlightImage;
+NSStatusItem *statusItem;
+NSImage *statusImage;
+NSImage *statusHighlightImage;
 }
 
 

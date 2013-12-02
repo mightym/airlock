@@ -8,13 +8,13 @@
 
 #import "ALAppDelegate.h"
 #import "ALAirlockService.h"
-#import "ALLoginscreenOverlayWindowController.h"
 
 @interface ALAppDelegate () {}
-@property (strong, nonatomic) ALLoginscreenOverlayWindowController* loginOverlay;
 @property (strong, nonatomic) IBOutlet NSSecureTextField* passwordField;
-@property (strong, nonatomic) IBOutlet NSSegmentedControl* ibeaconControl;
-@property (strong, nonatomic) IBOutlet NSSegmentedControl* peripheralControl;
+
+@property (strong, nonatomic) IBOutlet NSTextField* statusLabel;
+@property (strong, nonatomic) IBOutlet NSProgressIndicator* progressIndicator;
+
 @property (strong, nonatomic) IBOutlet NSSegmentedControl* discoverControl;
 @end
 
@@ -29,11 +29,8 @@
     [statusItem setAlternateImage:[NSImage imageNamed:@"statusIconInverted"]];
     [statusItem setMenu:statusMenu];
     [statusItem setToolTip:@"Airlock"];
-    [statusItem setHighlightMode:YES];
+    [statusItem setHighlightMode:NO];
     
-    self.ibeaconControl.selectedSegment = 0;
-    self.peripheralControl.selectedSegment = 0;
-    self.discoverControl.selectedSegment = 0;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -43,29 +40,27 @@
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+    [[ALAirlockService sharedService] stop];
+    // TODO
     return NSTerminateNow;
 }
 
 #pragma mark - init
 
 - (void)initializeAirlockService {
-    [[ALAirlockService sharedService] setLoginwindowDidBecomeFrontmostApplicationBlock:^{
-        [[[NSAppleScript alloc] initWithSource:@"say \"your mac is now locked!\"\n"] executeAndReturnError:nil];
+    self.statusLabel.stringValue = @"initialize";
+    [self.progressIndicator startAnimation:self];
 
-        self.loginOverlay = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
-        [self.loginOverlay.window setLevel:9999];
-        [self.loginOverlay showWindow:self];
-    }];
-    
-    [[ALAirlockService sharedService] setLoginwindowDidResignFrontmostApplicationBlock:^{
-        [self.loginOverlay close];
-        self.loginOverlay = nil;
-        [[[NSAppleScript alloc] initWithSource:@"say \"your mac is now unlocked.\"\n"] executeAndReturnError:nil];
-    }];
-    
-//    [[ALAirlockService sharedService] startMonitoring];
-//    [[ALAirlockService sharedService] monitorForDevice];
-//    [[ALAirlockService sharedService] advertiseAsiBeacon];
+    [[ALAirlockService sharedService] start];
+
+    /*
+     NSSegmentedControl* control = (NSSegmentedControl*)sender;
+     if (control.selectedSegment == 1) {
+     [[ALAirlockService sharedService] discoverAirlockOnIOS];
+     } {
+     [[ALAirlockService sharedService] stopDiscoverAirlockOnIOS];
+     }
+    */
 }
 
 #pragma mark - Interface Actions
@@ -75,44 +70,10 @@
     [[ALAirlockService sharedService] lockScreen];
 }
 
-- (IBAction)switchIBeacon:(id)sender
-{
-    NSSegmentedControl* control = (NSSegmentedControl*)sender;
-    if (control.selectedSegment == 1) {
-        [[ALAirlockService sharedService] startAdvertiseAsiBeacon];
-    } {
-        [[ALAirlockService sharedService] stopAdvertiseAsiBeacon];
-    }
-}
-
-- (IBAction)switchPeripheral:(id)sender
-{
-    NSSegmentedControl* control = (NSSegmentedControl*)sender;
-    if (control.selectedSegment == 1) {
-        [[ALAirlockService sharedService] startAdvertiseAsPeripheral];
-    } {
-        [[ALAirlockService sharedService] stopAdvertiseAsPeripheral];
-    }
-}
-
-- (IBAction)switchDiscover:(id)sender
-{
-    NSSegmentedControl* control = (NSSegmentedControl*)sender;
-    if (control.selectedSegment == 1) {
-        [[ALAirlockService sharedService] discoverAirlockOnIOS];
-    } {
-        [[ALAirlockService sharedService] stopDiscoverAirlockOnIOS];
-    }
-}
-
 #pragma mark - Helper
 
 - (NSString*)userPassword {
     return self.passwordField.stringValue;
 }
-
-
-#pragma mark -
-
 
 @end

@@ -14,18 +14,10 @@
 @property (nonatomic, copy) void (^loginwindowDidResignFrontmostApplicationBlock)(void);
 
 + (instancetype)sharedService;
-- (void)startMonitoring;
-- (void)stopMonitoring;
+
+- (void)start;
+- (void)stop;
 - (void)loginUser;
 - (void)lockScreen;
-
-- (void)startAdvertiseAsiBeacon;
-- (void)stopAdvertiseAsiBeacon;
-
-- (void)startAdvertiseAsPeripheral;
-- (void)stopAdvertiseAsPeripheral;
-
-- (void)discoverAirlockOnIOS;
-- (void)stopDiscoverAirlockOnIOS;
 
 @end

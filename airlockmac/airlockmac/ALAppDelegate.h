@@ -22,5 +22,6 @@ NSImage *statusHighlightImage;
 - (IBAction)disconnect:(id)sender;
 - (IBAction)clickSleepButton:(id)sender;
 - (NSString*)userPassword;
+- (void)updateStatus:(NSString*)newStatus;
 
 @end

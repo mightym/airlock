@@ -48,9 +48,7 @@
 #pragma mark - init
 
 - (void)initializeAirlockService {
-    self.statusLabel.stringValue = @"initialize";
-    [self.progressIndicator startAnimation:self];
-
+    [self updateStatus:@"initialize"];
     [[ALAirlockService sharedService] start];
 
     /*
@@ -68,6 +66,17 @@
 - (IBAction)clickSleepButton:(id)sender
 {
     [[ALAirlockService sharedService] lockScreen];
+}
+
+#pragma mark - 
+- (void)updateStatus:(NSString*)newStatus
+{
+    self.statusLabel.stringValue = newStatus;
+    if ([newStatus isEqualToString:@"initialize"] || [newStatus isEqualToString:@"discover"]) {
+        [self.progressIndicator startAnimation:self];
+    } else {
+        [self.progressIndicator stopAnimation:self];
+    }
 }
 
 #pragma mark - Helper

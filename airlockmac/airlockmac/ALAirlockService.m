@@ -302,6 +302,8 @@
 {
     if (self.isScanningForPeripherals) return;
     self.isScanningForPeripherals = YES;
+    
+    [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"discover"]; // TODO
 
 
         // check for already connected peripherals
@@ -379,9 +381,15 @@
                  error:(NSError *)error
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    
+    if ([peripheral isEqualTo:self.connectedPeripheral]) {
+        self.connectedPeripheral = nil;
+        [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"disconnected"]; // TODO
+    }
+
     [self.peripheralsToCheck removeObject:peripheral];
     if (self.peripheralsToCheck.count == 0) {
-        [self centralManagerDidUpdateState:self.centralManager];
+        [self findAndConnectAirlockPeripheral];
     }
 }
 
@@ -397,18 +405,19 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
     if ([self.peripheralsToCheck containsObject:peripheral]) {
         [peripheral discoverServices:@[[CBUUID UUIDWithString:kALServiceUUID]]];
+        // TODO timeout for didDiscoverServices
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   %@", ((CBService*)peripheral.services.firstObject).UUID);
 
     __block ALAirlockService* blockSelf = self;
     [self serviceWithUUID:[CBUUID UUIDWithString:kALServiceUUID]
                      from:peripheral
                 withBlock:^(CBService *service, CBPeripheral *peripheral) {
+                    [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"connected"]; // TODO
                     blockSelf.connectedPeripheral = peripheral;
                     [blockSelf.centralManager stopScan];
                     blockSelf.isScanningForPeripherals = NO;
@@ -429,6 +438,28 @@
                                                            forService:service];
                 }];
 }
+
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    
+    if (service.characteristics.count > 0) {
+        [self characteristicWithUUID:[CBUUID UUIDWithString:kALCharacteristic0UUID]
+                                from:peripheral
+                             service:service
+                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
+                               [peripheral readValueForCharacteristic:characteristic];
+                           }];
+    }
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"   error %@", error);
+    NSLog(@"   value %@", [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding]);
+}
+
 
 - (void)startRSSIMontitoring
 {
@@ -471,27 +502,6 @@
             [self findAndConnectAirlockPeripheral];
         }
     }
-}
-
-- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
-{
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-
-    if (service.characteristics.count > 0) {
-        [self characteristicWithUUID:[CBUUID UUIDWithString:kALCharacteristic0UUID]
-                                from:peripheral
-                             service:service
-                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
-                               [peripheral readValueForCharacteristic:characteristic];
-                           }];
-    }
-}
-
-- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
-{
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   error %@", error);
-    NSLog(@"   value %@", [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding]);
 }
 
 - (void)serviceWithUUID:(CBUUID*)uuid

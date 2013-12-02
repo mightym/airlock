@@ -20,6 +20,8 @@
 #define kALCharacteristic1UUID @"482D"
 #define kALCharacteristic2UUID @"F966"
 #define kALCharacteristic3UUID @"F310"
+#define kALRSSIMinimumToConnect -50
+#define kALRSSIMinimumToDisconnect -65
 
 
 @interface ALAirlockService () <CBCentralManagerDelegate, CBPeripheralDelegate> {}
@@ -354,7 +356,7 @@
     else if (peripheral.state == CBPeripheralStateConnecting) {
         reasonToIgnore = @"already connecting";
     }
-    else if ([RSSI intValue] <= -65) {
+    else if ([RSSI intValue] <= kALRSSIMinimumToConnect) {
         reasonToIgnore = @"too far away";
     }
     else if ([peripheral.name isEqualToString:@"estimote"]) {
@@ -491,7 +493,7 @@
 {
     NSLog(@"%@", [NSString stringWithFormat:@"%ld dB", (long)[peripheral.RSSI integerValue]]);
     
-    if ([peripheral.RSSI intValue] <= -75) {
+    if ([peripheral.RSSI intValue] <= kALRSSIMinimumToDisconnect) {
         NSLog(@"peripheral too far away");
         
         [self stopRSSIMonitoring];

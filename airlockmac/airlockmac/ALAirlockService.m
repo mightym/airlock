@@ -43,6 +43,7 @@
 
 @property BOOL isScanningForPeripherals;
 @property (strong, nonatomic) NSMutableArray *peripheralsToCheck;
+@property BOOL peripheralIsNearby;
 
 @end
 
@@ -66,8 +67,9 @@
     self = [super init];
     if (self) {
         self.loginwindowIsFrontmostApplication = NO;
-        self.screenIsSleeping = YES;
+        self.screenIsSleeping = NO;
         self.isScanningForPeripherals = NO;
+        self.peripheralIsNearby = NO;
     }
     return self;
 }
@@ -110,6 +112,13 @@
     [self setLoginwindowDidResignFrontmostApplicationBlock:^{
         [blockSafeSelf.loginOverlay close];
         blockSafeSelf.loginOverlay = nil;
+    }];
+    
+    [self setConnectedPeripheralEntersRange:^{
+        [blockSafeSelf loginUser];
+    }];
+    [self setConnectedPeripheralLeavesRange:^{
+        [blockSafeSelf lockScreen];
     }];
 
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
@@ -166,6 +175,9 @@
 - (void)receiveWakeNotifiation:(NSNotification*)notification
 {
     self.screenIsSleeping = NO;
+    if (self.peripheralIsNearby && self.connectedPeripheralEntersRange) {
+        self.connectedPeripheralEntersRange();
+    }
 }
 
 
@@ -187,7 +199,7 @@
 
 - (void)lockScreen
 {
-    if (self.screenIsSleeping) return;
+    if (self.screenIsSleeping || self.loginwindowIsFrontmostApplication) return;
     
     int screenSaverDelayUserSetting = 0;
     
@@ -387,6 +399,8 @@
     if ([peripheral isEqualTo:self.connectedPeripheral]) {
         self.connectedPeripheral = nil;
         [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"disconnected"]; // TODO
+        self.peripheralIsNearby = NO;
+        if (self.connectedPeripheralLeavesRange) self.connectedPeripheralLeavesRange();
     }
 
     [self.peripheralsToCheck removeObject:peripheral];
@@ -421,8 +435,13 @@
                 withBlock:^(CBService *service, CBPeripheral *peripheral) {
                     [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"connected"]; // TODO
                     blockSelf.connectedPeripheral = peripheral;
+                    
                     [blockSelf.centralManager stopScan];
                     blockSelf.isScanningForPeripherals = NO;
+
+                    self.peripheralIsNearby = YES;
+                    if (self.connectedPeripheralEntersRange) self.connectedPeripheralEntersRange();
+
                     for (CBPeripheral* connectedPeripheral in self.peripheralsToCheck) {
                         if (![self.connectedPeripheral isEqualTo:connectedPeripheral]) {
                             [self.centralManager cancelPeripheralConnection:connectedPeripheral];

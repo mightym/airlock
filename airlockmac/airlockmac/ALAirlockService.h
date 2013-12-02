@@ -13,6 +13,9 @@
 @property (nonatomic, copy) void (^loginwindowDidBecomeFrontmostApplicationBlock)(void);
 @property (nonatomic, copy) void (^loginwindowDidResignFrontmostApplicationBlock)(void);
 
+@property (nonatomic, copy) void (^connectedPeripheralLeavesRange)(void);
+@property (nonatomic, copy) void (^connectedPeripheralEntersRange)(void);
+
 + (instancetype)sharedService;
 
 - (void)start;

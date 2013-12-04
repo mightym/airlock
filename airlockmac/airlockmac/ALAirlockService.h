@@ -34,5 +34,7 @@
 - (void)airlockService:(ALAirlockService *)service didUpdateRSSI:(int)rssiValue;
 
 @optional
+- (void)airlockServiceLoginwindowDidBecomeFrontmostApplication:(ALAirlockService *)service;
+- (void)airlockServiceLoginwindowDidResignFrontmostApplication:(ALAirlockService *)service;
 
 @end

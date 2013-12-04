@@ -11,6 +11,9 @@
 
 @interface ALLoginscreenOverlayWindowController ()
 
+@property (strong) IBOutlet NSTextField *statusLabel;
+@property (strong) IBOutlet NSTextField *statusRssiLabel;
+
 @end
 
 @implementation ALLoginscreenOverlayWindowController
@@ -27,13 +30,22 @@
 - (void)windowDidLoad
 {
     [super windowDidLoad];
-    
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+    [self.window setLevel:9999];
 }
 
-- (IBAction)clickPretendIphoneIsNearButton:(id)sender {
-    ALAirlockService *airlockService = [[ALAirlockService alloc] init];
-    [airlockService performLogin];
+
+- (void)updateStatus:(NSString*)currentStatus
+{
+    // TODO use an enumeration instead of a string
+    self.statusLabel.stringValue = currentStatus;
+    if ([currentStatus isEqualToString:@"initialize"] || [currentStatus isEqualToString:@"discover"]) {
+    } else {
+    }
+}
+
+- (void)updateRssi:(int)value
+{
+    self.statusRssiLabel.stringValue = (value == 0) ? @"" : [NSString stringWithFormat:@"%ld dB", (long)value];
 }
 
 @end

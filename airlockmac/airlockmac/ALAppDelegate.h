@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "ALMainWindowController.h"
 #import "ALAirlockService.h"
+#import "ALLoginscreenOverlayWindowController.h"
 
 @interface ALAppDelegate : NSObject <NSApplicationDelegate, ALAirlockServiceDelegate> {
 
@@ -18,12 +19,8 @@
     NSImage *statusHighlightImage;
 
     ALMainWindowController *mainWindowController;
-    
+    ALLoginscreenOverlayWindowController *loginscreenOverlayWindowController;
+
 }
-
-
-@property (assign) IBOutlet NSWindow *window;
-
-- (IBAction)disconnect:(id)sender;
 
 @end

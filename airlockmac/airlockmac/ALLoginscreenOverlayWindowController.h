@@ -10,4 +10,7 @@
 
 @interface ALLoginscreenOverlayWindowController : NSWindowController
 
+- (void)updateStatus:(NSString*)currentStatus;
+- (void)updateRssi:(int)value;
+
 @end

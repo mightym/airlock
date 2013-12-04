@@ -12,8 +12,6 @@
 
 #import "ALAirlockService.h"
 #import "ALAppDelegate.h"
-#import "ALLoginscreenOverlayWindowController.h"
-
 
 #define kALServiceUUID @"0A84"
 #define kALCharacteristicDeviceNameUUID @"5CFE"
@@ -29,8 +27,6 @@
 
 @property (nonatomic, copy) void (^connectedPeripheralLeavesRange)(void);
 @property (nonatomic, copy) void (^connectedPeripheralEntersRange)(void);
-
-@property (strong, nonatomic) ALLoginscreenOverlayWindowController* loginOverlay;
 
 @property BOOL loginwindowIsFrontmostApplication;
 @property BOOL screenIsSleeping;
@@ -104,15 +100,13 @@
 {
     __block ALAirlockService* blockSafeSelf = self;
     [self setLoginwindowDidBecomeFrontmostApplicationBlock:^{
-        // TODO
-        blockSafeSelf.loginOverlay = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
-        [blockSafeSelf.loginOverlay.window setLevel:9999];
-        [blockSafeSelf.loginOverlay showWindow:blockSafeSelf];
+        if ([blockSafeSelf.delegate respondsToSelector:@selector(airlockServiceLoginwindowDidBecomeFrontmostApplication:)])
+            [blockSafeSelf.delegate airlockServiceLoginwindowDidBecomeFrontmostApplication:blockSafeSelf];
     }];
     
     [self setLoginwindowDidResignFrontmostApplicationBlock:^{
-        [blockSafeSelf.loginOverlay close];
-        blockSafeSelf.loginOverlay = nil;
+        if ([blockSafeSelf.delegate respondsToSelector:@selector(airlockServiceLoginwindowDidResignFrontmostApplication:)])
+            [blockSafeSelf.delegate airlockServiceLoginwindowDidResignFrontmostApplication:blockSafeSelf];
     }];
     
     [self setConnectedPeripheralEntersRange:^{

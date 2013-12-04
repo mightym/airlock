@@ -9,17 +9,10 @@
 #import "ALAppDelegate.h"
 
 @interface ALAppDelegate () {}
-@property (strong, nonatomic) IBOutlet NSSecureTextField* passwordField;
-
-@property (strong, nonatomic) IBOutlet NSTextField* statusLabel;
-@property (strong, nonatomic) IBOutlet NSProgressIndicator* progressIndicator;
-
-@property (strong, nonatomic) IBOutlet NSSegmentedControl* discoverControl;
+@property (nonatomic) NSString *lastStatus;
 @end
 
 @implementation ALAppDelegate
-
-- (void)disconnect:(id)sender {}
 
 - (void)awakeFromNib {
 }
@@ -75,17 +68,28 @@
 
 - (void)airlockService:(ALAirlockService *)service didUpdateStatus:(NSString *)currentStatus
 {
-    if (mainWindowController) {
-        [mainWindowController updateStatus:currentStatus];
-    }
+    self.lastStatus = currentStatus;
+    if (mainWindowController) [mainWindowController updateStatus:currentStatus];
+    if (loginscreenOverlayWindowController) [loginscreenOverlayWindowController updateStatus:currentStatus];
 }
 
 - (void)airlockService:(ALAirlockService *)service didUpdateRSSI:(int)rssiValue
 {
-    if (mainWindowController) {
-        [mainWindowController updateRssi:rssiValue];
-    }
+    if (mainWindowController) [mainWindowController updateRssi:rssiValue];
+    if (loginscreenOverlayWindowController) [loginscreenOverlayWindowController updateRssi:rssiValue];
 }
 
+- (void)airlockServiceLoginwindowDidBecomeFrontmostApplication:(ALAirlockService *)service
+{
+    loginscreenOverlayWindowController = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
+    [loginscreenOverlayWindowController showWindow:self];
+    [loginscreenOverlayWindowController updateStatus:self.lastStatus];
+}
+
+- (void)airlockServiceLoginwindowDidResignFrontmostApplication:(ALAirlockService *)service
+{
+    [loginscreenOverlayWindowController close];
+    loginscreenOverlayWindowController = nil;
+}
 
 @end

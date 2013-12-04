@@ -8,19 +8,31 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol ALAirlockServiceDelegate;
+
 @interface ALAirlockService : NSObject
 
-@property (nonatomic, copy) void (^loginwindowDidBecomeFrontmostApplicationBlock)(void);
-@property (nonatomic, copy) void (^loginwindowDidResignFrontmostApplicationBlock)(void);
+@property (nonatomic, weak) id <ALAirlockServiceDelegate> delegate;
 
-@property (nonatomic, copy) void (^connectedPeripheralLeavesRange)(void);
-@property (nonatomic, copy) void (^connectedPeripheralEntersRange)(void);
+@property (nonatomic, strong) NSString* password; // TODO get from keychain instead
+@property (nonatomic) int RSSIMinimumToConnect;
+@property (nonatomic) int RSSIMinimumToDisconnect;
 
 + (instancetype)sharedService;
 
-- (void)start;
+- (void)startWithDelegate:(id<ALAirlockServiceDelegate>)theDelegate;
 - (void)stop;
-- (void)loginUser;
-- (void)lockScreen;
+- (void)performLogin;
+- (void)performLockScreen;
+
+@end
+
+@protocol ALAirlockServiceDelegate <NSObject>
+
+@required
+- (void)airlockService:(ALAirlockService*)service didUpdateStatus:(NSString*)currentStatus;
+- (void)airlockService:(ALAirlockService *)service didUpdateRSSI:(int)rssiValue;
+
+@optional
 
 @end

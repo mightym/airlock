@@ -76,9 +76,9 @@
 - (void)enablePeripheralService
 {
     
-    CBMutableCharacteristic* characteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic0UUID]
+    CBMutableCharacteristic* deviceNamecharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic0UUID]
                                                                                  properties:CBCharacteristicPropertyRead
-                                                                                      value:[@"foobar" dataUsingEncoding:NSUTF8StringEncoding]
+                                                                                      value:[[[UIDevice currentDevice] name] dataUsingEncoding:NSUTF8StringEncoding]
                                                                                 permissions:CBAttributePermissionsReadable];
     
     CBMutableCharacteristic* characteristic1 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic1UUID]
@@ -99,7 +99,7 @@
     
     CBMutableService* service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:kALServiceUUID]
                                                                primary:YES];
-    service.characteristics = @[characteristic/*, characteristic1, characteristic2, characteristic3*/];
+    service.characteristics = @[deviceNamecharacteristic /*, characteristic1, characteristic2, characteristic3*/];
     
     self.service = service;
     

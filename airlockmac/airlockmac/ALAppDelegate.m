@@ -7,7 +7,6 @@
 //
 
 #import "ALAppDelegate.h"
-#import "ALAirlockService.h"
 
 @interface ALAppDelegate () {}
 @property (strong, nonatomic) IBOutlet NSSecureTextField* passwordField;
@@ -23,19 +22,13 @@
 - (void)disconnect:(id)sender {}
 
 - (void)awakeFromNib {
-    
-    statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    [statusItem setImage:[NSImage imageNamed:@"statusIcon"]];
-    [statusItem setAlternateImage:[NSImage imageNamed:@"statusIconInverted"]];
-    [statusItem setMenu:statusMenu];
-    [statusItem setToolTip:@"Airlock"];
-    [statusItem setHighlightMode:NO];
-    
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    [self initializeStatusIcon];
     [self initializeAirlockService];
+    [self initializeMainWindow];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -47,9 +40,20 @@
 
 #pragma mark - init
 
+- (void)initializeStatusIcon {
+    statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    [statusItem setImage:[NSImage imageNamed:@"statusIcon"]];
+    [statusItem setAlternateImage:[NSImage imageNamed:@"statusIconInverted"]];
+    [statusItem setMenu:statusMenu];
+    [statusItem setToolTip:@"Airlock"];
+    [statusItem setHighlightMode:NO];
+}
+
 - (void)initializeAirlockService {
-    [self updateStatus:@"initialize"];
-    [[ALAirlockService sharedService] start];
+    ALAirlockService *airlockService = [ALAirlockService sharedService];
+    [airlockService startWithDelegate:self];
+    airlockService.RSSIMinimumToConnect = 0;
+    airlockService.RSSIMinimumToDisconnect = 0;
 
     /*
      NSSegmentedControl* control = (NSSegmentedControl*)sender;
@@ -61,28 +65,27 @@
     */
 }
 
-#pragma mark - Interface Actions
-
-- (IBAction)clickSleepButton:(id)sender
-{
-    [[ALAirlockService sharedService] lockScreen];
+- (void)initializeMainWindow {
+    mainWindowController = [[ALMainWindowController alloc] initWithWindowNibName:@"ALMainWindowController"];
+    [mainWindowController showWindow:self];
+    [mainWindowController.window makeKeyAndOrderFront:self];
 }
 
-#pragma mark - 
-- (void)updateStatus:(NSString*)newStatus
+#pragma mark - ALAirlockServiceDelegate
+
+- (void)airlockService:(ALAirlockService *)service didUpdateStatus:(NSString *)currentStatus
 {
-    self.statusLabel.stringValue = newStatus;
-    if ([newStatus isEqualToString:@"initialize"] || [newStatus isEqualToString:@"discover"]) {
-        [self.progressIndicator startAnimation:self];
-    } else {
-        [self.progressIndicator stopAnimation:self];
+    if (mainWindowController) {
+        [mainWindowController updateStatus:currentStatus];
     }
 }
 
-#pragma mark - Helper
-
-- (NSString*)userPassword {
-    return self.passwordField.stringValue;
+- (void)airlockService:(ALAirlockService *)service didUpdateRSSI:(int)rssiValue
+{
+    if (mainWindowController) {
+        [mainWindowController updateRssi:rssiValue];
+    }
 }
+
 
 @end

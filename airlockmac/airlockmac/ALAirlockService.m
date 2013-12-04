@@ -16,26 +16,25 @@
 
 
 #define kALServiceUUID @"0A84"
-#define kALCharacteristic0UUID @"5CFE"
+#define kALCharacteristicDeviceNameUUID @"5CFE"
 #define kALCharacteristic1UUID @"482D"
 #define kALCharacteristic2UUID @"F966"
 #define kALCharacteristic3UUID @"F310"
-#define kALRSSIMinimumToConnect -50
-#define kALRSSIMinimumToDisconnect -65
 
 
 @interface ALAirlockService () <CBCentralManagerDelegate, CBPeripheralDelegate> {}
+
+@property (nonatomic, copy) void (^loginwindowDidBecomeFrontmostApplicationBlock)(void);
+@property (nonatomic, copy) void (^loginwindowDidResignFrontmostApplicationBlock)(void);
+
+@property (nonatomic, copy) void (^connectedPeripheralLeavesRange)(void);
+@property (nonatomic, copy) void (^connectedPeripheralEntersRange)(void);
 
 @property (strong, nonatomic) ALLoginscreenOverlayWindowController* loginOverlay;
 
 @property BOOL loginwindowIsFrontmostApplication;
 @property BOOL screenIsSleeping;
 @property (strong, nonatomic) NSTimer *watchFrontmostApplicationTimer;
-
-@property (strong, nonatomic) CBPeripheralManager *iBeaconManager;
-@property (strong, nonatomic) CBPeripheralManager *peripheralManager;
-@property (strong, nonatomic) CBMutableCharacteristic *characteristic;
-@property (strong, nonatomic) CBMutableService *service;
 
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) CBPeripheral *connectedPeripheral;
@@ -75,8 +74,9 @@
 }
 
 # pragma mark - API
-- (void)start
+- (void)startWithDelegate:(id<ALAirlockServiceDelegate>)theDelegate;
 {
+    self.delegate = theDelegate;
     [self startLockMonitoring];
     [self startPeripheralMonitoring];
     // connect/monitor device
@@ -104,6 +104,7 @@
 {
     __block ALAirlockService* blockSafeSelf = self;
     [self setLoginwindowDidBecomeFrontmostApplicationBlock:^{
+        // TODO
         blockSafeSelf.loginOverlay = [[ALLoginscreenOverlayWindowController alloc] initWithWindowNibName:@"ALLoginscreenOverlayWindowController"];
         [blockSafeSelf.loginOverlay.window setLevel:9999];
         [blockSafeSelf.loginOverlay showWindow:blockSafeSelf];
@@ -115,10 +116,10 @@
     }];
     
     [self setConnectedPeripheralEntersRange:^{
-        [blockSafeSelf loginUser];
+        [blockSafeSelf performLogin];
     }];
     [self setConnectedPeripheralLeavesRange:^{
-        [blockSafeSelf lockScreen];
+        [blockSafeSelf performLockScreen];
     }];
 
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
@@ -158,12 +159,14 @@
                 self.loginwindowDidBecomeFrontmostApplicationBlock();
         }
         self.loginwindowIsFrontmostApplication = YES;
+        [self.watchFrontmostApplicationTimer setTolerance:1.0];
     } else {
         if (self.loginwindowIsFrontmostApplication
             && self.loginwindowDidResignFrontmostApplicationBlock) {
             self.loginwindowDidResignFrontmostApplicationBlock();
         }
         self.loginwindowIsFrontmostApplication = NO;
+        [self.watchFrontmostApplicationTimer setTolerance:5.0];
     }
 }
 
@@ -175,6 +178,9 @@
 - (void)receiveWakeNotifiation:(NSNotification*)notification
 {
     self.screenIsSleeping = NO;
+    if (self.watchFrontmostApplicationTimer) {
+        [self fireWatchFrontmostApplicationTimer:self.watchFrontmostApplicationTimer];
+    }
     if (self.peripheralIsNearby && self.connectedPeripheralEntersRange) {
         self.connectedPeripheralEntersRange();
     }
@@ -183,21 +189,23 @@
 
 #pragma mark - login
 
-- (void)loginUser
+- (void)performLogin
 {
-    if (self.screenIsSleeping || !self.loginwindowIsFrontmostApplication) return;
+    if (self.screenIsSleeping
+        || !self.loginwindowIsFrontmostApplication
+        || !self.peripheralIsNearby
+        || [self.password isEqualToString:@""]) return;
     
-    ALAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
     [[[NSAppleScript alloc] initWithSource:
      [NSString stringWithFormat:@"tell application \"System Events\"\n keystroke \"%@\"\nkeystroke return\nend tell",
-        [appDelegate userPassword]]]
+        self.password]]
      executeAndReturnError:nil];
 }
 
 
 #pragma mark - lock screen
 
-- (void)lockScreen
+- (void)performLockScreen
 {
     if (self.screenIsSleeping || self.loginwindowIsFrontmostApplication) return;
     
@@ -317,7 +325,8 @@
     if (self.isScanningForPeripherals) return;
     self.isScanningForPeripherals = YES;
     
-    [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"discover"]; // TODO
+    [self.delegate airlockService:self didUpdateStatus:@"discover"];
+    [self.delegate airlockService:self didUpdateRSSI:0];
 
 
         // check for already connected peripherals
@@ -368,8 +377,8 @@
     else if (peripheral.state == CBPeripheralStateConnecting) {
         reasonToIgnore = @"already connecting";
     }
-    else if ([RSSI intValue] <= kALRSSIMinimumToConnect) {
-        reasonToIgnore = @"too far away";
+    else if ([RSSI intValue] <= self.RSSIMinimumToConnect) {
+        reasonToIgnore = @"out of range";
     }
     else if ([peripheral.name isEqualToString:@"estimote"]) {
         reasonToIgnore = @"ignore estimotes";
@@ -398,7 +407,8 @@
     
     if ([peripheral isEqualTo:self.connectedPeripheral]) {
         self.connectedPeripheral = nil;
-        [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"disconnected"]; // TODO
+        [self.delegate airlockService:self didUpdateStatus:@"disconnected"];
+        [self.delegate airlockService:self didUpdateRSSI:0];
         self.peripheralIsNearby = NO;
         if (self.connectedPeripheralLeavesRange) self.connectedPeripheralLeavesRange();
     }
@@ -433,12 +443,12 @@
     [self serviceWithUUID:[CBUUID UUIDWithString:kALServiceUUID]
                      from:peripheral
                 withBlock:^(CBService *service, CBPeripheral *peripheral) {
-                    [((ALAppDelegate*)[NSApplication sharedApplication].delegate) updateStatus:@"connected"]; // TODO
+                    [self.delegate airlockService:self didUpdateStatus:@"connected"];
+                    [self.delegate airlockService:self didUpdateRSSI:0];
                     blockSelf.connectedPeripheral = peripheral;
                     
                     [blockSelf.centralManager stopScan];
                     blockSelf.isScanningForPeripherals = NO;
-
                     self.peripheralIsNearby = YES;
                     if (self.connectedPeripheralEntersRange) self.connectedPeripheralEntersRange();
 
@@ -451,7 +461,7 @@
                     [self startRSSIMontitoring];
                     
                     [self.connectedPeripheral discoverCharacteristics:@[
-                                                                        [CBUUID UUIDWithString:kALCharacteristic0UUID],
+                                                                        [CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID],
                                                                         [CBUUID UUIDWithString:kALCharacteristic1UUID],
                                                                         [CBUUID UUIDWithString:kALCharacteristic2UUID],
                                                                         [CBUUID UUIDWithString:kALCharacteristic3UUID]
@@ -465,7 +475,7 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
     
     if (service.characteristics.count > 0) {
-        [self characteristicWithUUID:[CBUUID UUIDWithString:kALCharacteristic0UUID]
+        [self characteristicWithUUID:[CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID]
                                 from:peripheral
                              service:service
                            withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
@@ -476,9 +486,13 @@
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"   error %@", error);
-    NSLog(@"   value %@", [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding]);
+    if (error) NSLog(@"   error %@", error);
+    if (!error) {
+        if ([characteristic.UUID isEqualTo:[CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID]]) {
+            NSString *deviceName = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+            [self.delegate airlockService:self didUpdateStatus:[NSString stringWithFormat:@"connected (%@)", deviceName]];
+        }
+    }
 }
 
 
@@ -510,10 +524,10 @@
 
 - (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
 {
-    NSLog(@"%@", [NSString stringWithFormat:@"%ld dB", (long)[peripheral.RSSI integerValue]]);
+    [self.delegate airlockService:self didUpdateRSSI:[peripheral.RSSI intValue]];
     
-    if ([peripheral.RSSI intValue] <= kALRSSIMinimumToDisconnect) {
-        NSLog(@"peripheral too far away");
+    if ([peripheral.RSSI intValue] <= self.RSSIMinimumToDisconnect) {
+        [self.delegate airlockService:self didUpdateStatus:@"peripheral out of range"];
         
         [self stopRSSIMonitoring];
 

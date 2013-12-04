@@ -33,7 +33,7 @@
 
 - (IBAction)clickPretendIphoneIsNearButton:(id)sender {
     ALAirlockService *airlockService = [[ALAirlockService alloc] init];
-    [airlockService loginUser];
+    [airlockService performLogin];
 }
 
 @end

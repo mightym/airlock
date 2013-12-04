@@ -29,13 +29,14 @@
 		4D84C0601833D1D100F3D2D9 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C05F1833D1D100F3D2D9 /* main.c */; };
 		4D84C0621833D1D100F3D2D9 /* GetMetadataForFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C0611833D1D100F3D2D9 /* GetMetadataForFile.m */; };
 		4D84C0651833D1D100F3D2D9 /* MySpotlightImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C0641833D1D100F3D2D9 /* MySpotlightImporter.m */; };
+		F6180E39184F439E00550BCE /* ALMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6180E37184F439E00550BCE /* ALMainWindowController.m */; };
+		F6180E3A184F439E00550BCE /* ALMainWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F6180E38184F439E00550BCE /* ALMainWindowController.xib */; };
 		F647AA18183A5BB600CAA7BF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA17183A5BB600CAA7BF /* IOKit.framework */; };
 		F647AA19183A5BC100CAA7BF /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D84C0531833D1D100F3D2D9 /* CoreFoundation.framework */; };
 		F647AA1E183A746100CAA7BF /* ALAirlockService.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA1D183A746100CAA7BF /* ALAirlockService.m */; };
 		F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */; };
 		F647AA27183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */; };
 		F647AA29183B6AF400CAA7BF /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */; };
-		F647AA2E183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA2D183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +91,9 @@
 		4D84C0641833D1D100F3D2D9 /* MySpotlightImporter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MySpotlightImporter.m; sourceTree = "<group>"; };
 		4D84C0661833D1D100F3D2D9 /* Importer Read Me.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Importer Read Me.txt"; sourceTree = "<group>"; };
 		4D84C0671833D1D100F3D2D9 /* airlockmacImporter-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "airlockmacImporter-Prefix.pch"; sourceTree = "<group>"; };
+		F6180E36184F439E00550BCE /* ALMainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALMainWindowController.h; sourceTree = "<group>"; };
+		F6180E37184F439E00550BCE /* ALMainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALMainWindowController.m; sourceTree = "<group>"; };
+		F6180E38184F439E00550BCE /* ALMainWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ALMainWindowController.xib; sourceTree = "<group>"; };
 		F647AA17183A5BB600CAA7BF /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		F647AA1C183A746100CAA7BF /* ALAirlockService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALAirlockService.h; sourceTree = "<group>"; };
 		F647AA1D183A746100CAA7BF /* ALAirlockService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALAirlockService.m; sourceTree = "<group>"; };
@@ -97,8 +101,6 @@
 		F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALLoginscreenOverlayWindowController.m; sourceTree = "<group>"; };
 		F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ALLoginscreenOverlayWindowController.xib; sourceTree = "<group>"; };
 		F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = System/Library/Frameworks/IOBluetooth.framework; sourceTree = SDKROOT; };
-		F647AA2C183B8DF300CAA7BF /* BLCBeaconAdvertisementData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLCBeaconAdvertisementData.h; sourceTree = "<group>"; };
-		F647AA2D183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLCBeaconAdvertisementData.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,14 +192,15 @@
 				4D84C02C1833D1D100F3D2D9 /* ALAppDelegate.h */,
 				4D84C02D1833D1D100F3D2D9 /* ALAppDelegate.m */,
 				4D84C02F1833D1D100F3D2D9 /* MainMenu.xib */,
-				4D84C0211833D1D100F3D2D9 /* Supporting Files */,
+				F6180E36184F439E00550BCE /* ALMainWindowController.h */,
+				F6180E37184F439E00550BCE /* ALMainWindowController.m */,
+				F6180E38184F439E00550BCE /* ALMainWindowController.xib */,
 				F647AA1C183A746100CAA7BF /* ALAirlockService.h */,
 				F647AA1D183A746100CAA7BF /* ALAirlockService.m */,
 				F647AA23183A79CB00CAA7BF /* ALLoginscreenOverlayWindowController.h */,
 				F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */,
 				F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */,
-				F647AA2C183B8DF300CAA7BF /* BLCBeaconAdvertisementData.h */,
-				F647AA2D183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m */,
+				4D84C0211833D1D100F3D2D9 /* Supporting Files */,
 			);
 			path = airlockmac;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D84C0251833D1D100F3D2D9 /* InfoPlist.strings in Resources */,
+				F6180E3A184F439E00550BCE /* ALMainWindowController.xib in Resources */,
 				4D84C0361833D1D100F3D2D9 /* Images.xcassets in Resources */,
 				4D0D4E941835563600D2C238 /* statusIconInverted.tif in Resources */,
 				4D84C02B1833D1D100F3D2D9 /* Credits.rtf in Resources */,
@@ -395,11 +399,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6180E39184F439E00550BCE /* ALMainWindowController.m in Sources */,
 				F647AA1E183A746100CAA7BF /* ALAirlockService.m in Sources */,
 				4D84C0271833D1D100F3D2D9 /* main.m in Sources */,
 				4D84C02E1833D1D100F3D2D9 /* ALAppDelegate.m in Sources */,
 				F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */,
-				F647AA2E183B8DF300CAA7BF /* BLCBeaconAdvertisementData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

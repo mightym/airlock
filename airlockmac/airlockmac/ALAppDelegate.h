@@ -7,21 +7,23 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "ALMainWindowController.h"
+#import "ALAirlockService.h"
 
-@interface ALAppDelegate : NSObject <NSApplicationDelegate> {
+@interface ALAppDelegate : NSObject <NSApplicationDelegate, ALAirlockServiceDelegate> {
 
-IBOutlet NSMenu *statusMenu;
-NSStatusItem *statusItem;
-NSImage *statusImage;
-NSImage *statusHighlightImage;
+    IBOutlet NSMenu *statusMenu;
+    NSStatusItem *statusItem;
+    NSImage *statusImage;
+    NSImage *statusHighlightImage;
+
+    ALMainWindowController *mainWindowController;
+    
 }
 
 
 @property (assign) IBOutlet NSWindow *window;
 
 - (IBAction)disconnect:(id)sender;
-- (IBAction)clickSleepButton:(id)sender;
-- (NSString*)userPassword;
-- (void)updateStatus:(NSString*)newStatus;
 
 @end

@@ -22,5 +22,6 @@
     ALLoginscreenOverlayWindowController *loginscreenOverlayWindowController;
 
 }
+- (void)setDebug:(NSString*)debug;
 
 @end

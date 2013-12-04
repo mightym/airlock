@@ -6,6 +6,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ALMainWindowController">
             <connections>
+                <outlet property="debugView" destination="Pze-UT-mN1" id="awx-vU-KgZ"/>
                 <outlet property="loginPasswordField" destination="TwI-Tf-G4n" id="ztd-mI-aMG"/>
                 <outlet property="rssiToLockLabel" destination="ImW-QN-VQQ" id="Mgv-ca-LId"/>
                 <outlet property="rssiToLockSlider" destination="sQh-Gv-U3Y" id="w06-js-8RG"/>
@@ -21,16 +22,16 @@
         <window title="airlockmac" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="cQW-ZC-DZr">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="335" y="390" width="445" height="282"/>
+            <rect key="contentRect" x="335" y="390" width="652" height="351"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="445" height="282"/>
             <value key="maxSize" type="size" width="445" height="282"/>
             <view key="contentView" id="oFE-OJ-sZP">
-                <rect key="frame" x="0.0" y="0.0" width="445" height="282"/>
+                <rect key="frame" x="0.0" y="0.0" width="652" height="351"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwI-Tf-G4n">
-                        <rect key="frame" x="188" y="243" width="138" height="22"/>
+                        <rect key="frame" x="188" y="312" width="138" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="Nvt-Kn-kaA">
                             <font key="font" metaFont="system"/>
@@ -45,7 +46,7 @@
                         </secureTextFieldCell>
                     </secureTextField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hY1-PF-i06">
-                        <rect key="frame" x="18" y="245" width="106" height="17"/>
+                        <rect key="frame" x="18" y="314" width="106" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Login password:" id="M81-Wm-lve">
                             <font key="font" metaFont="system"/>
@@ -54,7 +55,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="24A-SJ-kHU">
-                        <rect key="frame" x="18" y="218" width="126" height="17"/>
+                        <rect key="frame" x="18" y="287" width="126" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="RSSI to lock screen:" id="5dW-4R-xg8">
                             <font key="font" metaFont="system"/>
@@ -63,7 +64,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lsz-H1-CkE">
-                        <rect key="frame" x="18" y="81" width="47" height="17"/>
+                        <rect key="frame" x="18" y="150" width="47" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Status:" id="SlV-gt-j4L">
                             <font key="font" metaFont="system"/>
@@ -72,7 +73,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t9B-zh-YIh">
-                        <rect key="frame" x="107" y="81" width="193" height="17"/>
+                        <rect key="frame" x="107" y="150" width="193" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="unkown" id="XPZ-6K-Fmg">
                             <font key="font" metaFont="system"/>
@@ -81,7 +82,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kWA-9W-rUB">
-                        <rect key="frame" x="107" y="56" width="193" height="17"/>
+                        <rect key="frame" x="107" y="125" width="193" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="-0 dB" id="2ZU-rq-YA6">
                             <font key="font" metaFont="system"/>
@@ -90,11 +91,11 @@
                         </textFieldCell>
                     </textField>
                     <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="bux-nU-8Kb">
-                        <rect key="frame" x="80" y="81" width="16" height="16"/>
+                        <rect key="frame" x="80" y="150" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
                     <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sQh-Gv-U3Y">
-                        <rect key="frame" x="186" y="217" width="142" height="21"/>
+                        <rect key="frame" x="186" y="286" width="142" height="21"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-127" doubleValue="-80" tickMarkPosition="below" sliderType="linear" id="KOI-JU-UdY"/>
                         <connections>
@@ -102,7 +103,7 @@
                         </connections>
                     </slider>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ImW-QN-VQQ">
-                        <rect key="frame" x="334" y="218" width="52" height="17"/>
+                        <rect key="frame" x="334" y="287" width="52" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="wHj-N5-YyF">
                             <font key="font" metaFont="system"/>
@@ -111,7 +112,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VZU-pa-dws">
-                        <rect key="frame" x="18" y="193" width="144" height="17"/>
+                        <rect key="frame" x="18" y="262" width="144" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="RSSI to login/connect:" id="8fl-vy-6tv">
                             <font key="font" metaFont="system"/>
@@ -120,7 +121,7 @@
                         </textFieldCell>
                     </textField>
                     <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PP1-eV-xjz">
-                        <rect key="frame" x="186" y="191" width="142" height="21"/>
+                        <rect key="frame" x="186" y="260" width="142" height="21"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-127" doubleValue="-65" tickMarkPosition="above" sliderType="linear" id="vbd-j0-OcA"/>
                         <connections>
@@ -128,7 +129,7 @@
                         </connections>
                     </slider>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ovp-Q9-tYp">
-                        <rect key="frame" x="334" y="193" width="52" height="17"/>
+                        <rect key="frame" x="334" y="262" width="52" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="yy3-fl-viM">
                             <font key="font" metaFont="system"/>
@@ -136,6 +137,35 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0u4-Av-grD">
+                        <rect key="frame" x="20" y="14" width="612" height="103"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <clipView key="contentView" ambiguous="YES" misplaced="YES" id="dn0-Tr-J34">
+                            <rect key="frame" x="1" y="1" width="610" height="101"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView ambiguous="YES" editable="NO" importsGraphics="NO" richText="NO" findStyle="panel" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="Pze-UT-mN1">
+                                    <rect key="frame" x="0.0" y="0.0" width="610" height="101"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="610" height="101"/>
+                                    <size key="maxSize" width="610" height="10000000"/>
+                                    <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="610" height="101"/>
+                                    <size key="maxSize" width="610" height="10000000"/>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="Poo-2O-Hm4">
+                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="nGH-qp-PnN">
+                            <rect key="frame" x="595" y="1" width="16" height="101"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                 </subviews>
             </view>
         </window>

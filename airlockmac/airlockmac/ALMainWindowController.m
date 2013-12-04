@@ -18,6 +18,7 @@
 @property (strong) IBOutlet NSTextField *statusLabel;
 @property (strong) IBOutlet NSProgressIndicator *statusProgressIndicator;
 @property (strong) IBOutlet NSTextField *statusRssiLabel;
+@property (strong) IBOutlet NSTextView *debugView;
 
 @end
 
@@ -72,6 +73,10 @@
 - (void)updateRssi:(int)value
 {
     self.statusRssiLabel.stringValue = (value == 0) ? @"" : [NSString stringWithFormat:@"%ld dB", (long)value];
+}
+
+- (void)setDebug:(NSString*)debug {
+    self.debugView.string = debug;
 }
 
 @end

@@ -40,6 +40,8 @@
 @property (strong, nonatomic) NSMutableArray *peripheralsToCheck;
 @property BOOL peripheralIsNearby;
 
+@property (nonatomic, strong) NSMutableDictionary* discoveredPeripherals;
+
 @end
 
 @implementation ALAirlockService
@@ -65,6 +67,7 @@
         self.screenIsSleeping = NO;
         self.isScanningForPeripherals = NO;
         self.peripheralIsNearby = NO;
+        self.discoveredPeripherals = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -190,6 +193,8 @@
         || !self.peripheralIsNearby
         || [self.password isEqualToString:@""]) return;
     
+    NSLog(@"login");
+    
     [[[NSAppleScript alloc] initWithSource:
      [NSString stringWithFormat:@"tell application \"System Events\"\n keystroke \"%@\"\nkeystroke return\nend tell",
         self.password]]
@@ -202,6 +207,12 @@
 - (void)performLockScreen
 {
     if (self.screenIsSleeping || self.loginwindowIsFrontmostApplication) return;
+    if ([self.password isEqualToString:@""]) {
+        NSLog(@"Do not lock; no password given.");
+        return;
+    }
+    
+    NSLog(@"lock screen");
     
     int screenSaverDelayUserSetting = 0;
     
@@ -292,6 +303,7 @@
     if (self.centralManager.state == CBCentralManagerStatePoweredOn) {
         [self.centralManager stopScan];
         self.isScanningForPeripherals = NO;
+        [self debugPeripheral:nil];
     }
     if (self.connectedPeripheral) {
         [self.centralManager cancelPeripheralConnection:self.connectedPeripheral];
@@ -363,28 +375,30 @@
 
     NSString *reasonToIgnore = nil;
     if ([self.peripheralsToCheck containsObject:peripheral]) {
-        reasonToIgnore = @"already checking";
+        reasonToIgnore = @"checking";
     }
     else if (peripheral.state == CBPeripheralStateConnected) {
-        reasonToIgnore = @"already connected";
+        reasonToIgnore = @"connected";
     }
     else if (peripheral.state == CBPeripheralStateConnecting) {
-        reasonToIgnore = @"already connecting";
-    }
-    else if ([RSSI intValue] <= self.RSSIMinimumToConnect) {
-        reasonToIgnore = @"out of range";
+        reasonToIgnore = @"connecting";
     }
     else if ([peripheral.name isEqualToString:@"estimote"]) {
         reasonToIgnore = @"ignore estimotes";
     }
+    else if ([RSSI intValue] <= self.RSSIMinimumToConnect) {
+        reasonToIgnore = @"out of range";
+    }
     
-    NSLog(@"discover: %@ / %@ / %ld / %d   (%@)",
-          peripheral.identifier,
-          peripheral.name,
-          peripheral.state,
-          [RSSI intValue],
-          reasonToIgnore
-          );
+    NSDictionary *peripheralDebugInformations = @{
+                                                  @"identifier": peripheral.identifier.UUIDString,
+                                                  @"name": [NSString stringWithFormat:@"%@", peripheral.name],
+                                                  @"state": [NSString stringWithFormat:@"%ld", peripheral.state],
+                                                  @"RSSI": [NSString stringWithFormat:@"%d", [RSSI intValue]],
+                                                  @"ignore": [NSString stringWithFormat:@"%@", reasonToIgnore]
+                                                  };
+    
+    [self debugPeripheral:peripheralDebugInformations];
 
     if (reasonToIgnore == nil) {
         peripheral.delegate = self;
@@ -444,6 +458,8 @@
                     [blockSelf.centralManager stopScan];
                     blockSelf.isScanningForPeripherals = NO;
                     self.peripheralIsNearby = YES;
+                    [blockSelf debugPeripheral:nil];
+                    
                     if (self.connectedPeripheralEntersRange) self.connectedPeripheralEntersRange();
 
                     for (CBPeripheral* connectedPeripheral in self.peripheralsToCheck) {
@@ -568,5 +584,31 @@
 
 #pragma mark -
 
+- (void)debugPeripheral:(NSDictionary*)peripheralDebugInformations
+{
+    if (peripheralDebugInformations) {
+        [self.discoveredPeripherals setValue:peripheralDebugInformations forKey:[peripheralDebugInformations valueForKey:@"identifier"]];
+    }
+
+    NSString *output = [@"" mutableCopy];
+    
+    output = [output stringByAppendingFormat:@"scaning: %@", self.isScanningForPeripherals ? @"YES" : @"NO"];
+    output = [output stringByAppendingFormat:@"   |   peripheral is nearby: %@", self.peripheralIsNearby ? @"YES" : @"NO"];
+
+    for (NSDictionary* peripheral in [self.discoveredPeripherals.allValues sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"identifier"
+                                                                                                                                       ascending:YES]]]) {
+        output = [output stringByAppendingFormat:@"\n%@ %@ %@ %@ %@",
+                  [peripheral valueForKey:@"identifier"],
+                  [peripheral valueForKey:@"name"],
+                  [peripheral valueForKey:@"state"],
+                  [peripheral valueForKey:@"RSSI"],
+                  [peripheral valueForKey:@"ignore"]
+                  ];
+    }
+    
+    ALAppDelegate *applicationDelegate = (ALAppDelegate*)[NSApplication sharedApplication].delegate;
+    [applicationDelegate setDebug:output];
+    
+}
 
 @end

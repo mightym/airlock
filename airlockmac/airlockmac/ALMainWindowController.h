@@ -19,4 +19,6 @@
 - (void)updateStatus:(NSString*)currentStatus;
 - (void)updateRssi:(int)value;
 
+- (void)setDebug:(NSString*)debug;
+
 @end

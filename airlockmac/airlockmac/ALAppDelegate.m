@@ -92,4 +92,8 @@
     loginscreenOverlayWindowController = nil;
 }
 
+- (void)setDebug:(NSString*)debug {
+    if (mainWindowController) [mainWindowController setDebug:debug];
+}
+
 @end

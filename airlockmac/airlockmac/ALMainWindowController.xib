@@ -97,7 +97,7 @@
                     <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sQh-Gv-U3Y">
                         <rect key="frame" x="186" y="286" width="142" height="21"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-127" doubleValue="-80" tickMarkPosition="below" sliderType="linear" id="KOI-JU-UdY"/>
+                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-127" doubleValue="-95" tickMarkPosition="below" sliderType="linear" id="KOI-JU-UdY"/>
                         <connections>
                             <action selector="rssiToLockValueChanged:" target="-2" id="7fd-gV-qvz"/>
                         </connections>
@@ -123,7 +123,7 @@
                     <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PP1-eV-xjz">
                         <rect key="frame" x="186" y="260" width="142" height="21"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-127" doubleValue="-65" tickMarkPosition="above" sliderType="linear" id="vbd-j0-OcA"/>
+                        <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-127" doubleValue="-75" tickMarkPosition="above" sliderType="linear" id="vbd-j0-OcA"/>
                         <connections>
                             <action selector="rssiToLoginValueChanged:" target="-2" id="EXr-gq-hQg"/>
                         </connections>
@@ -149,10 +149,10 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <size key="minSize" width="610" height="101"/>
-                                    <size key="maxSize" width="610" height="10000000"/>
+                                    <size key="maxSize" width="612" height="10000000"/>
                                     <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                     <size key="minSize" width="610" height="101"/>
-                                    <size key="maxSize" width="610" height="10000000"/>
+                                    <size key="maxSize" width="612" height="10000000"/>
                                 </textView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

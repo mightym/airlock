@@ -113,10 +113,13 @@
     }];
     
     [self setConnectedPeripheralEntersRange:^{
+        [NSObject cancelPreviousPerformRequestsWithTarget:blockSafeSelf selector:@selector(performLockScreen) object:nil];
+
         [blockSafeSelf performLogin];
     }];
     [self setConnectedPeripheralLeavesRange:^{
-        [blockSafeSelf performLockScreen];
+        NSLog(@"willLock");
+        [blockSafeSelf performSelector:@selector(performLockScreen) withObject:nil afterDelay:5.0f];
     }];
 
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self

@@ -45,12 +45,18 @@
 }
 
 - (IBAction)rssiToLockValueChanged:(NSSlider *)sender {
-    self.rssiToLockLabel.stringValue = [NSString stringWithFormat:@"%ld dB", (long)sender.integerValue];
+    if ((long)sender.intValue > self.rssiToLoginSlider.intValue) {
+        sender.intValue = self.rssiToLoginSlider.intValue;
+    }
+    self.rssiToLockLabel.stringValue = [NSString stringWithFormat:@"%ld dB", (long)sender.intValue];
     [[ALAirlockService sharedService] setRSSIMinimumToDisconnect:sender.intValue];
 }
 
 - (IBAction)rssiToLoginValueChanged:(NSSlider *)sender {
-    self.rssiToLoginLabel.stringValue = [NSString stringWithFormat:@"%ld dB", (long)sender.integerValue];
+    if ((long)sender.intValue < self.rssiToLockSlider.intValue) {
+        sender.intValue = self.rssiToLockSlider.intValue;
+    }
+    self.rssiToLoginLabel.stringValue = [NSString stringWithFormat:@"%ld dB", (long)sender.intValue];
     [[ALAirlockService sharedService] setRSSIMinimumToConnect:sender.intValue];
 }
 

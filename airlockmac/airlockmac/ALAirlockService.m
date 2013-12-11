@@ -34,6 +34,7 @@
 
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) CBPeripheral *connectedPeripheral;
+@property (strong, nonatomic) NSUUID *lastConnectedPeripheralIdentifier;
 @property (nonatomic) NSTimer* rssiUpdateTimer;
 
 @property BOOL isScanningForPeripherals;
@@ -113,13 +114,10 @@
     }];
     
     [self setConnectedPeripheralEntersRange:^{
-        [NSObject cancelPreviousPerformRequestsWithTarget:blockSafeSelf selector:@selector(performLockScreen) object:nil];
-
         [blockSafeSelf performLogin];
     }];
     [self setConnectedPeripheralLeavesRange:^{
-        NSLog(@"willLock");
-        [blockSafeSelf performSelector:@selector(performLockScreen) withObject:nil afterDelay:5.0f];
+        [blockSafeSelf performLockScreen];
     }];
 
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
@@ -181,8 +179,23 @@
     if (self.watchFrontmostApplicationTimer) {
         [self fireWatchFrontmostApplicationTimer:self.watchFrontmostApplicationTimer];
     }
-    if (self.peripheralIsNearby && self.connectedPeripheralEntersRange) {
+    if (self.peripheralIsNearby) {
+        [self performConnectedPeripheralEntersRange];
+    }
+}
+
+- (void)performConnectedPeripheralEntersRange
+{
+    if (self.connectedPeripheralEntersRange) {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(performConnectedPeripheralLeavesRange) object:nil];
         self.connectedPeripheralEntersRange();
+    }
+}
+
+- (void)performConnectedPeripheralLeavesRange
+{
+    if (self.connectedPeripheralLeavesRange) {
+        self.connectedPeripheralLeavesRange();
     }
 }
 
@@ -375,6 +388,7 @@
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 
     NSString *reasonToIgnore = nil;
     if ([self.peripheralsToCheck containsObject:peripheral]) {
@@ -406,8 +420,14 @@
     if (reasonToIgnore == nil) {
         peripheral.delegate = self;
         [self.peripheralsToCheck addObject:peripheral];
+        if (self.lastConnectedPeripheralIdentifier && [peripheral.identifier isEqualTo:self.lastConnectedPeripheralIdentifier]) {
+            NSLog(@"fast reconnect to last peripheral");
+            [self connectToAirlockPeripheral:peripheral];
+        }
         [self.centralManager connectPeripheral:peripheral
                                        options:@{CBConnectPeripheralOptionNotifyOnDisconnectionKey: @YES}];
+    } else {
+        NSLog(@"     %@ %@", [peripheral.identifier UUIDString], reasonToIgnore);
     }
 }
 
@@ -421,7 +441,7 @@
         [self.delegate airlockService:self didUpdateStatus:@"disconnected"];
         [self.delegate airlockService:self didUpdateRSSI:0];
         self.peripheralIsNearby = NO;
-        if (self.connectedPeripheralLeavesRange) self.connectedPeripheralLeavesRange();
+        [self performSelector:@selector(performConnectedPeripheralLeavesRange) withObject:nil afterDelay:4.0f];
     }
 
     [self.peripheralsToCheck removeObject:peripheral];
@@ -441,6 +461,7 @@
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     if ([self.peripheralsToCheck containsObject:peripheral]) {
+        [self startRSSIMontitoring];
         [peripheral discoverServices:@[[CBUUID UUIDWithString:kALServiceUUID]]];
         // TODO timeout for didDiscoverServices
     }
@@ -450,37 +471,47 @@
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
 
-    __block ALAirlockService* blockSelf = self;
-    [self serviceWithUUID:[CBUUID UUIDWithString:kALServiceUUID]
-                     from:peripheral
-                withBlock:^(CBService *service, CBPeripheral *peripheral) {
-                    [self.delegate airlockService:self didUpdateStatus:@"connected"];
-                    [self.delegate airlockService:self didUpdateRSSI:0];
-                    blockSelf.connectedPeripheral = peripheral;
-                    
-                    [blockSelf.centralManager stopScan];
-                    blockSelf.isScanningForPeripherals = NO;
-                    self.peripheralIsNearby = YES;
-                    [blockSelf debugPeripheral:nil];
-                    
-                    if (self.connectedPeripheralEntersRange) self.connectedPeripheralEntersRange();
+    if (peripheral.services.count > 0) {
+        __block ALAirlockService* blockSelf = self;
+        [self serviceWithUUID:[CBUUID UUIDWithString:kALServiceUUID]
+                         from:peripheral
+                    withBlock:^(CBService *service, CBPeripheral *peripheral) {
+                        [blockSelf connectToAirlockPeripheral:peripheral];
+                        [self.connectedPeripheral discoverCharacteristics:@[
+                                                                            [CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID],
+                                                                            [CBUUID UUIDWithString:kALCharacteristic1UUID],
+                                                                            [CBUUID UUIDWithString:kALCharacteristic2UUID],
+                                                                            [CBUUID UUIDWithString:kALCharacteristic3UUID]
+                                                                            ]
+                                                               forService:service];
+                    }];
+    } else {
+        [self.peripheralsToCheck removeObject:peripheral];
+    }
+}
 
-                    for (CBPeripheral* connectedPeripheral in self.peripheralsToCheck) {
-                        if (![self.connectedPeripheral isEqualTo:connectedPeripheral]) {
-                            [self.centralManager cancelPeripheralConnection:connectedPeripheral];
-                            [self.peripheralsToCheck removeObject:connectedPeripheral];
-                        }
-                    }
-                    [self startRSSIMontitoring];
-                    
-                    [self.connectedPeripheral discoverCharacteristics:@[
-                                                                        [CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID],
-                                                                        [CBUUID UUIDWithString:kALCharacteristic1UUID],
-                                                                        [CBUUID UUIDWithString:kALCharacteristic2UUID],
-                                                                        [CBUUID UUIDWithString:kALCharacteristic3UUID]
-                                                                        ]
-                                                           forService:service];
-                }];
+- (void)connectToAirlockPeripheral:(CBPeripheral*)peripheral
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+
+    [self.centralManager stopScan];
+    self.isScanningForPeripherals = NO;
+    self.peripheralIsNearby = YES;
+    [self debugPeripheral:nil];
+
+    [self.delegate airlockService:self didUpdateStatus:[NSString stringWithFormat:@"connected (- %@)", [peripheral.identifier UUIDString]]];
+    [self.delegate airlockService:self didUpdateRSSI:0];
+    self.connectedPeripheral = peripheral;
+    self.lastConnectedPeripheralIdentifier = peripheral.identifier;
+    
+    [self performConnectedPeripheralEntersRange];
+    
+    for (CBPeripheral* connectedPeripheral in self.peripheralsToCheck) {
+        if (![self.connectedPeripheral isEqualTo:connectedPeripheral]) {
+            [self.centralManager cancelPeripheralConnection:connectedPeripheral];
+            [self.peripheralsToCheck removeObject:connectedPeripheral];
+        }
+    }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
@@ -503,7 +534,7 @@
     if (!error) {
         if ([characteristic.UUID isEqualTo:[CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID]]) {
             NSString *deviceName = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-            [self.delegate airlockService:self didUpdateStatus:[NSString stringWithFormat:@"connected (%@)", deviceName]];
+            [self.delegate airlockService:self didUpdateStatus:[NSString stringWithFormat:@"connected (%@ %@)", deviceName, [peripheral.identifier UUIDString]]];
         }
     }
 }

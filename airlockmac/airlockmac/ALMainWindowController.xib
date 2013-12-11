@@ -28,7 +28,7 @@
             <value key="maxSize" type="size" width="445" height="282"/>
             <view key="contentView" id="oFE-OJ-sZP">
                 <rect key="frame" x="0.0" y="0.0" width="652" height="351"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TwI-Tf-G4n">
                         <rect key="frame" x="188" y="312" width="138" height="22"/>
@@ -73,7 +73,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t9B-zh-YIh">
-                        <rect key="frame" x="107" y="150" width="193" height="17"/>
+                        <rect key="frame" x="107" y="150" width="527" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="unkown" id="XPZ-6K-Fmg">
                             <font key="font" metaFont="system"/>

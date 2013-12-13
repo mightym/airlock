@@ -9,22 +9,28 @@
 #import "ALDebugOverviewTableViewController.h"
 #import <CoreLocation/CoreLocation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
+#import <CommonCrypto/CommonDigest.h>
 
 #define kALServiceUUID @"0A84"
-#define kALCharacteristic0UUID @"5CFE"
-#define kALCharacteristic1UUID @"482D"
-#define kALCharacteristic2UUID @"F966"
-#define kALCharacteristic3UUID @"F310"
+#define kALCharacteristicDeviceNameUUID @"5CFE"
+#define kALCharacteristicWriteChallengeUUID @"482D"
+#define kALCharacteristicReadChallengeUUID @"F966"
+#define kALChallengeSecret @"FBC29689-D890-4DCD-A7D2-41A95CAFBB5D"
 
 @interface ALDebugOverviewTableViewController () <CBPeripheralManagerDelegate>
 
 @property (nonatomic, strong) IBOutlet UISwitch* switchAdvertisePeripheral;
 @property (strong, nonatomic) CBPeripheralManager *peripheralManager;
-@property (strong, nonatomic) CBMutableCharacteristic *characteristic;
+@property (strong, nonatomic) CBMutableCharacteristic *deviceNamecharacteristic;
+@property (strong, nonatomic) CBMutableCharacteristic *readChallengeCharacteristic;
+@property (strong, nonatomic) CBMutableCharacteristic *writeChallengeCharacteristic;
 @property (strong, nonatomic) CBMutableService *service;
 
 @property (nonatomic) NSTimer* rssiUpdateTimer;
 @property (nonatomic) CLProximity lastBeaconProximity;
+
+@property (nonatomic) NSString* queuedData;
+@property (nonatomic) NSString* readChallengeValue;
 
 @end
 
@@ -63,7 +69,11 @@
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     [self stopAdvertiseAsPeripheral];
-    self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
+    if (self.peripheralManager == nil) {
+        self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil];
+    } else {
+        [self peripheralManagerDidUpdateState:self.peripheralManager];
+    }
 }
 
 - (void)stopAdvertiseAsPeripheral
@@ -76,43 +86,42 @@
 - (void)enablePeripheralService
 {
     
-    CBMutableCharacteristic* deviceNamecharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic0UUID]
+    self.deviceNamecharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID]
                                                                                  properties:CBCharacteristicPropertyRead
                                                                                       value:[[[UIDevice currentDevice] name] dataUsingEncoding:NSUTF8StringEncoding]
                                                                                 permissions:CBAttributePermissionsReadable];
     
-    CBMutableCharacteristic* characteristic1 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic1UUID]
-                                                                                  properties:CBCharacteristicPropertyRead
-                                                                                       value:nil
-                                                                                 permissions:CBAttributePermissionsReadable];
+    self.readChallengeValue = [self sha1:[self generateRandomString:40]];
+    self.readChallengeCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicReadChallengeUUID]
+                                                                          properties:CBCharacteristicPropertyRead
+                                                                               value:[self.readChallengeValue dataUsingEncoding:NSUTF8StringEncoding]
+                                                                         permissions:CBAttributePermissionsReadable];
     
-    CBMutableCharacteristic* characteristic2 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic2UUID]
-                                                                                  properties:CBCharacteristicPropertyWrite
+    self.writeChallengeCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicWriteChallengeUUID]
+                                                                                  properties:CBCharacteristicPropertyWrite | CBCharacteristicPropertyNotify
                                                                                        value:nil
                                                                                  permissions:CBAttributePermissionsWriteable];
-    
-    CBMutableCharacteristic* characteristic3 = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristic3UUID]
-                                                                                  properties:CBCharacteristicPropertyWrite
-                                                                                       value:nil
-                                                                                 permissions:CBAttributePermissionsWriteEncryptionRequired];
     
     
     CBMutableService* service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:kALServiceUUID]
                                                                primary:YES];
-    service.characteristics = @[deviceNamecharacteristic /*, characteristic1, characteristic2, characteristic3*/];
+    service.characteristics = @[
+                                self.deviceNamecharacteristic,
+                                self.readChallengeCharacteristic,
+                                self.writeChallengeCharacteristic
+                                ];
     
     self.service = service;
     
-    if (self.peripheralManager.isAdvertising) [self.peripheralManager stopAdvertising];
+    if (self.peripheralManager.isAdvertising) {
+        [self.peripheralManager stopAdvertising];
+    }
     [self.peripheralManager removeAllServices];
     [self.peripheralManager addService:self.service];
 }
 
 - (void)startAdvertisingPeripheral {
-    [self.peripheralManager startAdvertising:@{
-//                                               CBAdvertisementDataLocalNameKey: @"airlockIOS",
-//                                               CBAdvertisementDataServiceUUIDsKey: @[[CBUUID UUIDWithString:kALServiceUUID]]
-                                               }];
+    [self.peripheralManager startAdvertising:@{}];
 }
 
 #pragma mark - CBPeripheralManagerDelegate
@@ -120,58 +129,143 @@
 - (void)peripheralManagerDidUpdateState:(CBPeripheralManager *)peripheral
 {
     NSLog(@"%s %ld", __PRETTY_FUNCTION__, peripheral.state);
-    if (peripheral.state == CBPeripheralManagerStatePoweredOn) {
-        if (peripheral == self.peripheralManager) {
-            [self enablePeripheralService];
+
+    switch (peripheral.state) {
+        case CBPeripheralManagerStatePoweredOn:
+            if (peripheral == self.peripheralManager) {
+                [self enablePeripheralService];
+            }
+            break;
+
+        case CBPeripheralManagerStateUnsupported:
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Bluetooth"
+                                                            message:@"Your device is not supported."
+                                                           delegate:self
+                                                  cancelButtonTitle:@"Okay"
+                                                  otherButtonTitles:nil];
+            [alert show];
+            self.switchAdvertisePeripheral.on = NO;
+            break;
         }
+            
+        default:
+            self.switchAdvertisePeripheral.on = NO;
+            break;
     }
-    // TODO check the other states
 }
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didAddService:(CBService *)service error:(NSError *)error {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     [self startAdvertisingPeripheral];
 }
 
 - (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheral error:(NSError *)error
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     if (error) NSLog(@"%@", error);
 }
 
-- (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveReadRequest:(CBATTRequest *)request
-{
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    NSLog(@"  %@", request.central.identifier);
-    
-    
-    if ([request.characteristic.UUID isEqual:[CBUUID UUIDWithString:@"482D14E2-DA9A-4795-9841-9DF3F8165259"]]) {
-        
-        NSData *value = [[[NSDate date] description] dataUsingEncoding:NSUTF8StringEncoding];
-        if (request.offset > value.length) {
-            [peripheral respondToRequest:request withResult:CBATTErrorInvalidOffset];
-            return;
-        }
-        
-        request.value = [value subdataWithRange:NSMakeRange(request.offset, MIN(value.length - request.offset, 20))];
-        [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
-//    [peripheral respondToRequest:request withResult:CBATTErrorInsufficientAuthentication];
-        return;
-    }
-    
-    [peripheral respondToRequest:request withResult:CBATTErrorRequestNotSupported];
-    
-    return;
-}
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral didReceiveWriteRequests:(NSArray *)requests
 {
-    for (CBATTRequest* request in requests) {
-        NSLog(@"request.value: %@ (for %@)",
-              [[NSString alloc] initWithData:request.value encoding:NSUTF8StringEncoding],
-              request.characteristic.UUID);
-        [peripheral respondToRequest:request withResult:CBATTErrorSuccess];
+    CBATTRequest* firstRequest = requests.firstObject;
+    if ([firstRequest.characteristic.UUID isEqual:[CBUUID UUIDWithString:kALCharacteristicWriteChallengeUUID]]) {
+        NSString *incomingString = @"";
+        for (CBATTRequest* request in requests) {
+            incomingString = [incomingString stringByAppendingString:[[NSString alloc] initWithData:request.value encoding:NSUTF8StringEncoding]];
+        }
+        
+        if ([incomingString isEqualToString:@""]) {
+            [peripheral respondToRequest:firstRequest withResult:CBATTErrorRequestNotSupported];
+            return;
+        }
+        
+        NSLog(@"incomingChallenge %@", incomingString);
+        
+        NSArray *chunks = [incomingString componentsSeparatedByString:@"."];
+        NSString *challengeResponse = chunks.firstObject;
+        NSString *incomingChallenge = chunks.lastObject;
+        
+        NSString *expectedChallengeResponse = [self sha1:[NSString stringWithFormat:@"%@%@%@", self.readChallengeValue, incomingChallenge, kALChallengeSecret]];
+        
+        if ([challengeResponse isEqualToString:expectedChallengeResponse]) {
+            NSLog(@"challenge accepted!");
+            NSString *newChallenge = [self sha1:[self generateRandomString:40]];
+            NSString *challengeResponse = [self sha1:[NSString stringWithFormat:@"%@%@%@", incomingChallenge, newChallenge, kALChallengeSecret]];
+
+            NSLog(@"newChallenge %@", newChallenge);
+            NSString *response = [NSString stringWithFormat:@"%@.%@", challengeResponse, newChallenge];
+            NSLog(@"response %@", response);
+            
+            [self sendChallengeResponse:response peripheral:peripheral];
+            [peripheral respondToRequest:firstRequest withResult:CBATTErrorSuccess];
+        } else {
+            NSLog(@"invalid challenge!");
+            [self sendChallengeResponse:@"error" peripheral:peripheral];
+            [peripheral respondToRequest:firstRequest withResult:CBATTErrorWriteNotPermitted];
+        }
+    } else {
+        [peripheral respondToRequest:firstRequest withResult:CBATTErrorAttributeNotFound];
     }
+}
+
+- (void)sendChallengeResponse:(NSString*)response peripheral:(CBPeripheralManager *)peripheral
+{
+    self.queuedData = [NSString stringWithFormat:@"%@#", response];
+    [self sendQueuedData:peripheral];
+}
+
+- (void)peripheralManagerIsReadyToUpdateSubscribers:(CBPeripheralManager *)peripheral
+{
+    [self sendQueuedData:peripheral];
+}
+
+- (void)sendQueuedData:(CBPeripheralManager *)peripheral
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    BOOL success = YES;
+    while (success && self.queuedData.length > 0) {
+        int chunkSize = 20;
+        NSString *chunk = [self.queuedData substringWithRange:NSMakeRange(0, MIN(chunkSize, self.queuedData.length))];
+        NSLog(@"send %@", chunk);
+        success = [peripheral updateValue:[chunk dataUsingEncoding:NSUTF8StringEncoding]
+                        forCharacteristic:self.writeChallengeCharacteristic
+                     onSubscribedCentrals:nil];
+        if (success) {
+            self.queuedData = [self.queuedData substringFromIndex:chunk.length];
+        }
+    }
+}
+
+- (void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didSubscribeToCharacteristic:(CBCharacteristic *)characteristic
+{
+    NSLog(@"%s %@", __PRETTY_FUNCTION__, central);
+}
+
+#pragma mark -
+
+-(NSString*)generateRandomString:(int)num
+{
+    NSMutableString* string = [NSMutableString stringWithCapacity:num];
+    for (int i = 0; i < num; i++) {
+        [string appendFormat:@"%C", (unichar)('a' + arc4random_uniform(25))];
+    }
+    return string;
+}
+
+- (NSString *)sha1:(NSString*)string
+{
+    NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+    
+    CC_SHA1(data.bytes, (unsigned int)data.length, digest);
+    
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
+    
+    for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
+        [output appendFormat:@"%02x", digest[i]];
+    }
+    
+    return output;
 }
 
 #pragma mark -

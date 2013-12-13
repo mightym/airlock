@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Carbon/Carbon.h>
+#import <Cocoa/Cocoa.h>
+
+
 @protocol ALAirlockServiceDelegate;
 
 @interface ALAirlockService : NSObject

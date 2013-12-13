@@ -8,6 +8,7 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
+#include <IOKit/pwr_mgt/IOPMLib.h>
 #include <IOBluetooth/IOBluetooth.h>
 #import <CommonCrypto/CommonDigest.h>
 
@@ -31,6 +32,7 @@
 
 @property BOOL loginwindowIsFrontmostApplication;
 @property BOOL screenIsSleeping;
+@property BOOL immediateWakeup;
 @property (strong, nonatomic) NSTimer *watchFrontmostApplicationTimer;
 
 @property (strong, nonatomic) CBCentralManager *centralManager;
@@ -73,6 +75,7 @@
         self.screenIsSleeping = NO;
         self.isScanningForPeripherals = NO;
         self.peripheralIsNearby = NO;
+        self.immediateWakeup = YES;
         self.discoveredPeripherals = [NSMutableDictionary dictionary];
         self.ignorePeripheralIdentifiers =[NSMutableArray array];
     }
@@ -177,6 +180,19 @@
 - (void)receiveSleepNotifiation:(NSNotification*)notification
 {
     self.screenIsSleeping = YES;
+    if (self.immediateWakeup) {
+        self.immediateWakeup = NO;
+        [self wakeUp];
+    }
+}
+
+- (void)wakeUp
+{
+    io_registry_entry_t regEntry = IORegistryEntryFromPath(kIOMasterPortDefault, "IOService:/IOResources/IODisplayWrangler");
+    if (regEntry != MACH_PORT_NULL) {
+        IORegistryEntrySetCFProperty(regEntry, CFSTR("IORequestIdle"), kCFBooleanFalse);
+        IOObjectRelease(regEntry);
+    }
 }
 
 - (void)receiveWakeNotifiation:(NSNotification*)notification
@@ -235,6 +251,8 @@
     }
     
     NSLog(@"lock screen");
+    
+    self.immediateWakeup = YES;
     
     int screenSaverDelayUserSetting = 0;
     
@@ -535,7 +553,7 @@
         
         [self debugPeripheral:peripheralDebugInformations];
         
-        for (CBPeripheral* connectedPeripheral in self.peripheralsToCheck) {
+        for (CBPeripheral* connectedPeripheral in [self.peripheralsToCheck copy]) {
             if (![self.connectedPeripheral isEqualTo:connectedPeripheral]) {
                 [self.centralManager cancelPeripheralConnection:connectedPeripheral];
                 [self.peripheralsToCheck removeObject:connectedPeripheral];

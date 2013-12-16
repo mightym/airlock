@@ -7,6 +7,7 @@
 //
 
 #import "ALAppDelegate.h"
+#import "ALSetupService.h"
 
 @interface ALAppDelegate () {}
 @property (nonatomic) NSString *lastStatus;
@@ -20,8 +21,9 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     [self initializeStatusIcon];
-    [self initializeAirlockService];
-    [self initializeMainWindow];
+//    [self initializeAirlockService];
+//    [self initializeMainWindow];
+    [self setup];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -62,6 +64,12 @@
     mainWindowController = [[ALMainWindowController alloc] initWithWindowNibName:@"ALMainWindowController"];
     [mainWindowController showWindow:self];
     [mainWindowController.window makeKeyAndOrderFront:self];
+}
+
+- (void)setup {
+    if (![[ALSetupService sharedService] hasValidSetup]) {
+        [[ALSetupService sharedService] startSetup];
+    }
 }
 
 #pragma mark - ALAirlockServiceDelegate

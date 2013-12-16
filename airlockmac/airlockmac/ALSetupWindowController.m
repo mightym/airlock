@@ -106,7 +106,7 @@ typedef enum {
 - (IBAction)notYetImplementedAction:(id)sender
 {
     NSAlert *alert = [NSAlert alertWithMessageText:@"Not yet implemented" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"foobar"];
-    [alert runModal];
+    [alert beginSheetModalForWindow:self.window completionHandler:nil];
 }
 
 @end

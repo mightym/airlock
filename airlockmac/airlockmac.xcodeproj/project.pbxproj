@@ -40,6 +40,8 @@
 		F6865C95185F5A74005DD8F4 /* ALSetupService.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865C94185F5A74005DD8F4 /* ALSetupService.m */; };
 		F6865C9B185F5B87005DD8F4 /* ALSetupWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865C99185F5B87005DD8F4 /* ALSetupWindowController.m */; };
 		F6865C9C185F5B87005DD8F4 /* ALSetupWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F6865C9A185F5B87005DD8F4 /* ALSetupWindowController.xib */; };
+		F6865C9F185F6604005DD8F4 /* ALSetupStep2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865C9E185F6604005DD8F4 /* ALSetupStep2ViewController.m */; };
+		F6865CA3185F6952005DD8F4 /* ALDeviceService.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865CA2185F6952005DD8F4 /* ALDeviceService.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +111,10 @@
 		F6865C98185F5B87005DD8F4 /* ALSetupWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALSetupWindowController.h; sourceTree = "<group>"; };
 		F6865C99185F5B87005DD8F4 /* ALSetupWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALSetupWindowController.m; sourceTree = "<group>"; };
 		F6865C9A185F5B87005DD8F4 /* ALSetupWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ALSetupWindowController.xib; sourceTree = "<group>"; };
+		F6865C9D185F6603005DD8F4 /* ALSetupStep2ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALSetupStep2ViewController.h; sourceTree = "<group>"; };
+		F6865C9E185F6604005DD8F4 /* ALSetupStep2ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALSetupStep2ViewController.m; sourceTree = "<group>"; };
+		F6865CA1185F6952005DD8F4 /* ALDeviceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALDeviceService.h; sourceTree = "<group>"; };
+		F6865CA2185F6952005DD8F4 /* ALDeviceService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALDeviceService.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -281,6 +287,7 @@
 		F6865C91185F5A48005DD8F4 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F6865CA0185F691A005DD8F4 /* Device */,
 				F6865C92185F5A55005DD8F4 /* Setup */,
 			);
 			name = Services;
@@ -309,8 +316,19 @@
 				F6865C98185F5B87005DD8F4 /* ALSetupWindowController.h */,
 				F6865C99185F5B87005DD8F4 /* ALSetupWindowController.m */,
 				F6865C9A185F5B87005DD8F4 /* ALSetupWindowController.xib */,
+				F6865C9D185F6603005DD8F4 /* ALSetupStep2ViewController.h */,
+				F6865C9E185F6604005DD8F4 /* ALSetupStep2ViewController.m */,
 			);
 			name = Setup;
+			sourceTree = "<group>";
+		};
+		F6865CA0185F691A005DD8F4 /* Device */ = {
+			isa = PBXGroup;
+			children = (
+				F6865CA1185F6952005DD8F4 /* ALDeviceService.h */,
+				F6865CA2185F6952005DD8F4 /* ALDeviceService.m */,
+			);
+			name = Device;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -446,7 +464,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6865C95185F5A74005DD8F4 /* ALSetupService.m in Sources */,
+				F6865CA3185F6952005DD8F4 /* ALDeviceService.m in Sources */,
 				F6180E39184F439E00550BCE /* ALMainWindowController.m in Sources */,
+				F6865C9F185F6604005DD8F4 /* ALSetupStep2ViewController.m in Sources */,
 				F647AA1E183A746100CAA7BF /* ALAirlockService.m in Sources */,
 				4D84C0271833D1D100F3D2D9 /* main.m in Sources */,
 				4D84C02E1833D1D100F3D2D9 /* ALAppDelegate.m in Sources */,

@@ -6,8 +6,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ALSetupWindowController">
             <connections>
+                <outlet property="boxView" destination="uFL-cL-Kgc" id="ePA-WS-tbC"/>
                 <outlet property="innerView" destination="n9K-T3-5it" id="f5g-KR-LwW"/>
                 <outlet property="step1ViewController" destination="e9y-WK-fO4" id="fow-je-noM"/>
+                <outlet property="step2ViewController" destination="vv7-F3-WCS" id="5T9-Vh-YWl"/>
                 <outlet property="window" destination="1" id="3"/>
             </connections>
         </customObject>
@@ -80,20 +82,84 @@
             <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QBd-oe-BdI">
-                    <rect key="frame" x="198" y="113" width="38" height="17"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QBd-oe-BdI">
+                    <rect key="frame" x="73" y="83" width="288" height="76"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="KCA-IF-h1M">
+                    <constraints>
+                        <constraint firstAttribute="height" constant="76" id="ZXB-wF-jne"/>
+                    </constraints>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="KCA-IF-h1M">
+                        <font key="font" metaFont="system"/>
+                        <string key="title">By continuing, you're confirming that you agree to the terms for using Airlock. Please take a moment to read them. Lorem ipsum dolor sit</string>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="QBd-oe-BdI" firstAttribute="centerX" secondItem="CI2-ad-eoI" secondAttribute="centerX" id="3nU-wN-D9v"/>
+                <constraint firstItem="QBd-oe-BdI" firstAttribute="centerY" secondItem="CI2-ad-eoI" secondAttribute="centerY" id="M1a-iU-gbD"/>
+                <constraint firstItem="QBd-oe-BdI" firstAttribute="leading" secondItem="CI2-ad-eoI" secondAttribute="leading" constant="75" id="yvo-wW-NO1"/>
+            </constraints>
+        </customView>
+        <viewController id="e9y-WK-fO4">
+            <connections>
+                <outlet property="view" destination="CI2-ad-eoI" id="2fd-fu-MRH"/>
+            </connections>
+        </viewController>
+        <customView id="Drd-bt-Ecp">
+            <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7ol-9l-ruu">
+                    <rect key="frame" x="85" y="140" width="265" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Download Airlock for iPhone and start it!" id="XKR-LX-1XF">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="emy-VW-aka">
+                    <rect key="frame" x="137" y="104" width="161" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="push" title="Go to the AppStore" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="sAI-Qa-fju">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="clickDownloadButton:" target="vv7-F3-WCS" id="mxc-8O-0ld"/>
+                    </connections>
+                </button>
+                <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="zK7-mQ-jWe">
+                    <rect key="frame" x="209" y="59" width="16" height="16"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                </progressIndicator>
+                <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UK1-CJ-NXM">
+                    <rect key="frame" x="18" y="29" width="398" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="status" id="k0r-IG-oAh">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
             </subviews>
+            <constraints>
+                <constraint firstAttribute="centerY" secondItem="7ol-9l-ruu" secondAttribute="centerY" constant="27" id="Bo3-3J-TGB"/>
+                <constraint firstAttribute="centerX" secondItem="zK7-mQ-jWe" secondAttribute="centerX" id="T8V-Hy-FrQ"/>
+                <constraint firstAttribute="centerX" secondItem="emy-VW-aka" secondAttribute="centerX" id="YOL-0c-I7G"/>
+                <constraint firstAttribute="centerY" secondItem="emy-VW-aka" secondAttribute="centerY" id="bNr-DR-U7r"/>
+                <constraint firstAttribute="bottom" secondItem="zK7-mQ-jWe" secondAttribute="bottom" constant="59" id="jXA-0H-IHF"/>
+                <constraint firstAttribute="centerX" secondItem="7ol-9l-ruu" secondAttribute="centerX" id="k5X-vO-OzX"/>
+            </constraints>
         </customView>
-        <viewController id="e9y-WK-fO4">
+        <viewController id="vv7-F3-WCS" customClass="ALSetupStep2ViewController">
             <connections>
-                <outlet property="view" destination="CI2-ad-eoI" id="2fd-fu-MRH"/>
+                <outlet property="progressIndicator" destination="zK7-mQ-jWe" id="Jqo-u2-5pY"/>
+                <outlet property="setupWindowController" destination="-2" id="Cwx-Sa-lHX"/>
+                <outlet property="statusLabel" destination="UK1-CJ-NXM" id="2XN-B0-RH9"/>
+                <outlet property="view" destination="Drd-bt-Ecp" id="Rv0-lL-xyy"/>
             </connections>
         </viewController>
     </objects>

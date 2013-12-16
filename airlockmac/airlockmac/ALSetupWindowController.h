@@ -10,4 +10,6 @@
 
 @interface ALSetupWindowController : NSWindowController
 
+- (void)showNext;
+
 @end

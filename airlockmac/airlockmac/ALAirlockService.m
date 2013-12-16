@@ -77,7 +77,7 @@
         self.peripheralIsNearby = NO;
         self.immediateWakeup = YES;
         self.discoveredPeripherals = [NSMutableDictionary dictionary];
-        self.ignorePeripheralIdentifiers =[NSMutableArray array];
+        self.ignorePeripheralIdentifiers = [NSMutableArray array];
     }
     return self;
 }
@@ -158,7 +158,7 @@
 - (void)fireWatchFrontmostApplicationTimer:(NSTimer*)theTimer
 {
 
-    if (self.screenIsSleeping) return;
+    // if (self.screenIsSleeping) return;
     
     if ([[[[NSWorkspace sharedWorkspace] frontmostApplication] bundleIdentifier] isEqualToString:@"com.apple.loginwindow"]) {
         if (!self.loginwindowIsFrontmostApplication
@@ -182,7 +182,6 @@
     self.screenIsSleeping = YES;
     if (self.immediateWakeup) {
         self.immediateWakeup = NO;
-        [self wakeUp];
     }
 }
 
@@ -226,11 +225,18 @@
 
 - (void)performLogin
 {
-    if (self.screenIsSleeping
-        || !self.loginwindowIsFrontmostApplication
+    if (/*self.screenIsSleeping
+        || */ !self.loginwindowIsFrontmostApplication
         || !self.peripheralIsNearby
-        || [self.password isEqualToString:@""]) return;
+        || [self.password isEqualToString:@""]) {
+        return;
+    }
     
+    if (self.screenIsSleeping) {
+        [self wakeUp];
+    }
+    
+    [self say:@"login"];
     NSLog(@"login");
     
     [[[NSAppleScript alloc] initWithSource:
@@ -251,6 +257,7 @@
     }
     
     NSLog(@"lock screen");
+    [self say:@"lock screen"];
     
     self.immediateWakeup = YES;
     

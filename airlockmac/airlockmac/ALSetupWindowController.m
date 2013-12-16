@@ -10,7 +10,8 @@
 
 typedef enum {
 	ALSetupStep1,
-	ALSetupStep2
+	ALSetupStep2,
+	ALSetupStep3
 } ALSetupStep;
 
 
@@ -19,8 +20,12 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet NSBox *boxView;
 @property (nonatomic, strong) IBOutlet NSView *innerView;
 
+@property (nonatomic, strong) IBOutlet NSButton *quitButton;
+@property (nonatomic, strong) IBOutlet NSButton *continueButton;
+
 @property (nonatomic, strong) IBOutlet NSViewController *step1ViewController;
 @property (nonatomic, strong) IBOutlet NSViewController *step2ViewController;
+@property (nonatomic, strong) IBOutlet NSViewController *step3ViewController;
 
 @property ALSetupStep currentSetupStep;
 
@@ -57,8 +62,17 @@ typedef enum {
 {
     self.currentSetupStep = ALSetupStep2;
     self.boxView.title = @"Step 2";
+    [self.continueButton setEnabled:NO];
     [self.step1ViewController.view removeFromSuperview];
     [self.innerView addSubview:self.step2ViewController.view];
+}
+
+- (void)showStep3
+{
+    self.currentSetupStep = ALSetupStep3;
+    self.boxView.title = @"Step 3";
+    [self.step2ViewController.view removeFromSuperview];
+    [self.innerView addSubview:self.step3ViewController.view];
 }
 
 - (void)showNext
@@ -69,7 +83,7 @@ typedef enum {
             break;
             
         case ALSetupStep2:
-            [self notYetImplementedAction:nil];
+            [self showStep3];
             break;
             
         default:

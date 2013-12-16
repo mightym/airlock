@@ -7,9 +7,12 @@
         <customObject id="-2" userLabel="File's Owner" customClass="ALSetupWindowController">
             <connections>
                 <outlet property="boxView" destination="uFL-cL-Kgc" id="ePA-WS-tbC"/>
+                <outlet property="continueButton" destination="WuM-mV-ZYF" id="PV5-4U-y4M"/>
                 <outlet property="innerView" destination="n9K-T3-5it" id="f5g-KR-LwW"/>
+                <outlet property="quitButton" destination="A0L-QP-uAk" id="MIy-5x-b9N"/>
                 <outlet property="step1ViewController" destination="e9y-WK-fO4" id="fow-je-noM"/>
                 <outlet property="step2ViewController" destination="vv7-F3-WCS" id="5T9-Vh-YWl"/>
+                <outlet property="step3ViewController" destination="qNE-yC-Z0p" id="Bc5-BS-Q6e"/>
                 <outlet property="window" destination="1" id="3"/>
             </connections>
         </customObject>
@@ -102,6 +105,29 @@
                 <constraint firstItem="QBd-oe-BdI" firstAttribute="leading" secondItem="CI2-ad-eoI" secondAttribute="leading" constant="75" id="yvo-wW-NO1"/>
             </constraints>
         </customView>
+        <customView id="Lv0-Mb-yF6">
+            <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qP8-Km-ykA">
+                    <rect key="frame" x="73" y="83" width="288" height="76"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="76" id="qYa-CI-oMp"/>
+                    </constraints>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="A list of airlock devices will apear here. Continously updating... The user will choose one." id="5Qf-4e-Vh6">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="qP8-Km-ykA" firstAttribute="centerX" secondItem="Lv0-Mb-yF6" secondAttribute="centerX" id="N8F-MA-MRK"/>
+                <constraint firstItem="qP8-Km-ykA" firstAttribute="leading" secondItem="Lv0-Mb-yF6" secondAttribute="leading" constant="75" id="Tj3-qX-17N"/>
+                <constraint firstItem="qP8-Km-ykA" firstAttribute="centerY" secondItem="Lv0-Mb-yF6" secondAttribute="centerY" id="wrA-Sn-3xW"/>
+            </constraints>
+        </customView>
         <viewController id="e9y-WK-fO4">
             <connections>
                 <outlet property="view" destination="CI2-ad-eoI" id="2fd-fu-MRH"/>
@@ -160,6 +186,11 @@
                 <outlet property="setupWindowController" destination="-2" id="Cwx-Sa-lHX"/>
                 <outlet property="statusLabel" destination="UK1-CJ-NXM" id="2XN-B0-RH9"/>
                 <outlet property="view" destination="Drd-bt-Ecp" id="Rv0-lL-xyy"/>
+            </connections>
+        </viewController>
+        <viewController id="qNE-yC-Z0p">
+            <connections>
+                <outlet property="view" destination="Lv0-Mb-yF6" id="jpB-1d-p8q"/>
             </connections>
         </viewController>
     </objects>

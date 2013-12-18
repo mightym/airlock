@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ALDiscoveredDevice.h"
 
 @protocol ALDeviceServiceDelegate;
 
@@ -14,6 +15,8 @@
 
 - (void)scanForNearbyDevices;
 - (void)stopScanning;
+
+- (NSArray *)devices;
 
 @property (nonatomic, weak) id<ALDeviceServiceDelegate> delegate;
 
@@ -24,7 +27,8 @@
 @protocol ALDeviceServiceDelegate <NSObject>
 
 @required
-- (void)airlockDeviceService:(ALDeviceService*)service didFoundDevice:(NSString*)uuid;
+- (void)airlockDeviceService:(ALDeviceService*)service didFoundDevice:(ALDiscoveredDevice*)device;
+- (void)airlockDeviceService:(ALDeviceService*)service didRemoveDeviceWithIdentifier:(NSUUID*)identifier;
 
 @end
 

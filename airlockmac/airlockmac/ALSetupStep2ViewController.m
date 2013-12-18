@@ -12,6 +12,7 @@
 
 @property (nonatomic, strong) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic, strong) IBOutlet NSTextField *statusLabel;
+@property (nonatomic, strong) ALDeviceService *deviceService;
 
 @end
 
@@ -19,20 +20,27 @@
 
 - (void)awakeFromNib
 {
+}
+
+- (void)start {
     [self scanForDevices];
 }
 
+- (void)stop {
+    if (self.deviceService == nil) [self.deviceService stopScanning];
+}
 
-#pragma mark - 
+#pragma mark -
 - (void) scanForDevices
 {
     self.statusLabel.stringValue = @"Scanning for an iPhone with Airlock nearby...";
     [self.statusLabel setHidden:NO];
     [self.progressIndicator setHidden:NO];
     [self.progressIndicator startAnimation:self];
-    ALDeviceService *deviceService = [[ALDeviceService alloc] init];
-    deviceService.delegate = self;
-    [deviceService scanForNearbyDevices];
+
+    if (self.deviceService == nil) self.deviceService = [[ALDeviceService alloc] init];
+    self.deviceService.delegate = self;
+    [self.deviceService scanForNearbyDevices];
 }
 
 #pragma mark - ALDeviceServiceDelegate

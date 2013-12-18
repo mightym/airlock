@@ -1,8 +1,8 @@
 //
-//  ALSetupStep2ViewController.h
+//  ALSetupStep3ViewController.h
 //  airlockmac
 //
-//  Created by Tobias Liebig on 16.12.13.
+//  Created by Tobias Liebig on 17.12.13.
 //  Copyright (c) 2013 Mark Wirblich. All rights reserved.
 //
 
@@ -10,7 +10,7 @@
 #import "ALDeviceService.h"
 #import "ALSetupWindowController.h"
 
-@interface ALSetupStep2ViewController : NSViewController <ALDeviceServiceDelegate>
+@interface ALSetupStep3ViewController : NSViewController <ALDeviceServiceDelegate, NSTableViewDataSource, NSTableViewDelegate>
 
 @property (nonatomic, weak) IBOutlet ALSetupWindowController* setupWindowController;
 

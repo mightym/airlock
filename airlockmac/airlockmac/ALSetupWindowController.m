@@ -7,6 +7,8 @@
 //
 
 #import "ALSetupWindowController.h"
+#import "ALSetupStep2ViewController.h"
+#import "ALSetupStep3ViewController.h"
 
 typedef enum {
 	ALSetupStep1,
@@ -24,8 +26,8 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet NSButton *continueButton;
 
 @property (nonatomic, strong) IBOutlet NSViewController *step1ViewController;
-@property (nonatomic, strong) IBOutlet NSViewController *step2ViewController;
-@property (nonatomic, strong) IBOutlet NSViewController *step3ViewController;
+@property (nonatomic, strong) IBOutlet ALSetupStep2ViewController *step2ViewController;
+@property (nonatomic, strong) IBOutlet ALSetupStep3ViewController *step3ViewController;
 
 @property ALSetupStep currentSetupStep;
 
@@ -64,15 +66,20 @@ typedef enum {
     self.boxView.title = @"Step 2";
     [self.continueButton setEnabled:NO];
     [self.step1ViewController.view removeFromSuperview];
+
     [self.innerView addSubview:self.step2ViewController.view];
+    [self.step2ViewController start];
 }
 
 - (void)showStep3
 {
     self.currentSetupStep = ALSetupStep3;
     self.boxView.title = @"Step 3";
+    [self.step2ViewController stop];
     [self.step2ViewController.view removeFromSuperview];
+
     [self.innerView addSubview:self.step3ViewController.view];
+    [self.step3ViewController start];
 }
 
 - (void)showNext

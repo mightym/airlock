@@ -10,9 +10,11 @@
 #import <CoreLocation/CoreLocation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <CommonCrypto/CommonDigest.h>
+#include <sys/utsname.h>
 
 #define kALServiceUUID @"0A84"
 #define kALCharacteristicDeviceNameUUID @"5CFE"
+#define kALCharacteristicDevicePlatformUUID @"1319"
 #define kALCharacteristicWriteChallengeUUID @"482D"
 #define kALCharacteristicReadChallengeUUID @"F966"
 #define kALChallengeSecret @"FBC29689-D890-4DCD-A7D2-41A95CAFBB5D"
@@ -21,7 +23,8 @@
 
 @property (nonatomic, strong) IBOutlet UISwitch* switchAdvertisePeripheral;
 @property (strong, nonatomic) CBPeripheralManager *peripheralManager;
-@property (strong, nonatomic) CBMutableCharacteristic *deviceNamecharacteristic;
+@property (strong, nonatomic) CBMutableCharacteristic *deviceNameCharacteristic;
+@property (strong, nonatomic) CBMutableCharacteristic *devicePlatformCharacteristic;
 @property (strong, nonatomic) CBMutableCharacteristic *readChallengeCharacteristic;
 @property (strong, nonatomic) CBMutableCharacteristic *writeChallengeCharacteristic;
 @property (strong, nonatomic) CBMutableService *service;
@@ -86,11 +89,20 @@
 - (void)enablePeripheralService
 {
     
-    self.deviceNamecharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID]
+    self.deviceNameCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID]
                                                                                  properties:CBCharacteristicPropertyRead
                                                                                       value:[[[UIDevice currentDevice] name] dataUsingEncoding:NSUTF8StringEncoding]
                                                                                 permissions:CBAttributePermissionsReadable];
+
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    NSString* platform = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
     
+    self.devicePlatformCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicDevicePlatformUUID]
+                                                                       properties:CBCharacteristicPropertyRead
+                                                                            value:[platform dataUsingEncoding:NSUTF8StringEncoding]
+                                                                      permissions:CBAttributePermissionsReadable];
+
     self.readChallengeValue = [self sha1:[self generateRandomString:40]];
     self.readChallengeCharacteristic = [[CBMutableCharacteristic alloc] initWithType:[CBUUID UUIDWithString:kALCharacteristicReadChallengeUUID]
                                                                           properties:CBCharacteristicPropertyRead
@@ -106,7 +118,8 @@
     CBMutableService* service = [[CBMutableService alloc] initWithType:[CBUUID UUIDWithString:kALServiceUUID]
                                                                primary:YES];
     service.characteristics = @[
-                                self.deviceNamecharacteristic,
+                                self.deviceNameCharacteristic,
+                                self.devicePlatformCharacteristic,
                                 self.readChallengeCharacteristic,
                                 self.writeChallengeCharacteristic
                                 ];

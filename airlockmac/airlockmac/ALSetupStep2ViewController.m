@@ -45,20 +45,23 @@
 
 #pragma mark - ALDeviceServiceDelegate
 
-- (void)airlockDeviceService:(ALDeviceService *)service didFoundDevice:(NSString *)uuid
+- (void)airlockDeviceService:(ALDeviceService *)service didFoundDevice:(ALDiscoveredDevice *)device
+{
+    self.statusLabel.stringValue = @"checking nearby devices...";
+}
+
+- (void)airlockDeviceService:(ALDeviceService *)service didUpdateDevice:(ALDiscoveredDevice *)device
 {
     [service stopScanning];
     [self.progressIndicator setHidden:YES];
-    self.statusLabel.stringValue = @"iPhone with Airlock found!";
     if (self.setupWindowController) [self.setupWindowController showNext];
 }
 
-#pragma mark - Interface Actions
-
-- (IBAction)clickDownloadButton:(id)sender
+- (void)airlockDeviceService:(ALDeviceService *)service didRemoveDeviceWithIdentifier:(NSUUID *)identifier
 {
-    [self notYetImplementedAction:sender];
 }
+
+#pragma mark - Interface Actions
 
 - (IBAction)notYetImplementedAction:(id)sender
 {

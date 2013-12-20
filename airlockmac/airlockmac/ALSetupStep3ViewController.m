@@ -39,7 +39,10 @@
     [self.deviceService scanForNearbyDevices];
 
     [[self.deviceService devices] enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        [self.listOfFoundDevices addObject:obj];
+        ALDiscoveredDevice* device = (ALDiscoveredDevice*)obj;
+        if (device.deviceName != nil && ![device.deviceName isEqualToString:@""]) {
+            [self.listOfFoundDevices addObject:device];
+        }
     }];
 
     [self.tableView reloadData];
@@ -50,8 +53,6 @@
 
 - (void)airlockDeviceService:(ALDeviceService *)service didFoundDevice:(ALDiscoveredDevice *)device
 {
-    [self.listOfFoundDevices addObject:device];
-    [self.tableView reloadData];
 }
 
 - (void)airlockDeviceService:(ALDeviceService *)service didRemoveDeviceWithIdentifier:(NSUUID *)identifier
@@ -69,6 +70,17 @@
     }
 }
 
+- (void)airlockDeviceService:(ALDeviceService *)service didUpdateDevice:(ALDiscoveredDevice *)device
+{
+    if (![device.deviceName isEqualToString:@""] && ![device.platform isEqualToString:@""]) {
+        if (![self.listOfFoundDevices containsObject:device]) {
+            [self.listOfFoundDevices addObject:device];
+        }
+        [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:[self.listOfFoundDevices indexOfObject:device]]
+                                  columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+}
+
 #pragma mark - NSTableViewDatasource
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView;
@@ -78,14 +90,17 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    return [[(ALDiscoveredDevice*)[self.listOfFoundDevices objectAtIndex:row] identifier] UUIDString];
+    ALDiscoveredDevice* device = (ALDiscoveredDevice*)[self.listOfFoundDevices objectAtIndex:row];
+    return [NSString stringWithString:device.description];
 }
 
 #pragma mark - NSTableViewDelegate
-
+/*
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     NSLog(@"tableViewSelectionDidChange");
 }
+ */
+
 
 @end

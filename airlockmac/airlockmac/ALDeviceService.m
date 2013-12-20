@@ -27,6 +27,11 @@
 				   name:kALNotificationsBluetoothServiceDeviceDisappearedNotification
 				 object:nil];
     
+	[center addObserver:self
+			   selector:@selector(deviceUpdated:)
+				   name:kALNotificationsBluetoothServiceDeviceUpdatedNotification
+				 object:nil];
+    
     [[ALBluetoothScanner sharedService] startScanning];
 }
 
@@ -57,6 +62,15 @@
         ALDiscoveredDevice* device = (ALDiscoveredDevice*)[notification.userInfo objectForKey:@"newDevice"];
         if (self.delegate) [self.delegate airlockDeviceService:self
                                                 didFoundDevice:device];
+    }
+}
+
+- (void)deviceUpdated:(NSNotification *)notification
+{
+    if ([notification.userInfo objectForKey:@"updatedDevice"]) {
+        ALDiscoveredDevice* device = (ALDiscoveredDevice*)[notification.userInfo objectForKey:@"updatedDevice"];
+        if (self.delegate) [self.delegate airlockDeviceService:self
+                                               didUpdateDevice:device];
     }
 }
 

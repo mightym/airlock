@@ -29,6 +29,7 @@
 @required
 - (void)airlockDeviceService:(ALDeviceService*)service didFoundDevice:(ALDiscoveredDevice*)device;
 - (void)airlockDeviceService:(ALDeviceService*)service didRemoveDeviceWithIdentifier:(NSUUID*)identifier;
+- (void)airlockDeviceService:(ALDeviceService*)service didUpdateDevice:(ALDiscoveredDevice*)device;
 
 @end
 

@@ -15,6 +15,8 @@
 @property (nonatomic, strong) CBPeripheral *peripheral;
 @property (nonatomic, strong) NSNumber *lastRSSI;
 @property (nonatomic, strong) NSDate *lastSeen;
+@property (nonatomic, strong) NSString *deviceName;
+@property (nonatomic, strong) NSString *platform;
 
 - (NSString*)description;
 

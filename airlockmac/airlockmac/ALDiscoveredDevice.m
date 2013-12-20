@@ -12,7 +12,9 @@
 
 - (NSString*)description
 {
-    return [self.identifier UUIDString];
+    return [NSString stringWithFormat:@"%@ (%@)",
+            [self.deviceName isEqualToString:@""] ? @"<unknown>" : self.deviceName,
+            self.platform];
 }
 
 @end

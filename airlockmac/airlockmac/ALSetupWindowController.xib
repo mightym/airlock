@@ -49,6 +49,9 @@
                         <buttonCell key="cell" type="push" title="Continue" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Bru-76-thw">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
                         </buttonCell>
                         <connections>
                             <action selector="clickContinue:" target="-2" id="Wdn-u9-N4P"/>
@@ -71,9 +74,9 @@
                     <constraint firstAttribute="trailing" secondItem="uFL-cL-Kgc" secondAttribute="trailing" constant="20" id="CpJ-Pe-8Fj"/>
                     <constraint firstItem="uFL-cL-Kgc" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="E6C-4U-Od7"/>
                     <constraint firstItem="uFL-cL-Kgc" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="ITZ-Pb-JVX"/>
+                    <constraint firstItem="A0L-QP-uAk" firstAttribute="top" secondItem="uFL-cL-Kgc" secondAttribute="bottom" constant="20" id="LK4-xA-gDR"/>
                     <constraint firstItem="WuM-mV-ZYF" firstAttribute="leading" secondItem="A0L-QP-uAk" secondAttribute="trailing" constant="12" id="MG5-lI-shD"/>
                     <constraint firstAttribute="trailing" secondItem="WuM-mV-ZYF" secondAttribute="trailing" constant="20" id="Q35-p5-tOn"/>
-                    <constraint firstItem="A0L-QP-uAk" firstAttribute="top" secondItem="uFL-cL-Kgc" secondAttribute="bottom" constant="20" id="TPM-vQ-FRk"/>
                     <constraint firstAttribute="bottom" secondItem="A0L-QP-uAk" secondAttribute="bottom" constant="20" id="ZPb-Q1-0pB"/>
                 </constraints>
             </view>
@@ -122,14 +125,14 @@
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o7E-yi-Xgv">
-                    <rect key="frame" x="75" y="20" width="284" height="83"/>
+                    <rect key="frame" x="75" y="20" width="284" height="116"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <clipView key="contentView" id="sSJ-ib-GC9">
-                        <rect key="frame" x="1" y="1" width="282" height="81"/>
+                        <rect key="frame" x="1" y="1" width="282" height="114"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" id="zzG-gl-Rjc">
-                                <rect key="frame" x="0.0" y="0.0" width="282" height="81"/>
+                                <rect key="frame" x="0.0" y="0.0" width="282" height="114"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -172,7 +175,7 @@
                 <constraint firstItem="qP8-Km-ykA" firstAttribute="leading" secondItem="Lv0-Mb-yF6" secondAttribute="leading" constant="75" id="7QK-D5-3t0"/>
                 <constraint firstItem="qP8-Km-ykA" firstAttribute="centerX" secondItem="o7E-yi-Xgv" secondAttribute="centerX" id="KKv-ac-nzD"/>
                 <constraint firstAttribute="bottom" secondItem="o7E-yi-Xgv" secondAttribute="bottom" constant="20" symbolic="YES" id="Toi-2g-zaR"/>
-                <constraint firstItem="o7E-yi-Xgv" firstAttribute="top" secondItem="qP8-Km-ykA" secondAttribute="bottom" constant="44" id="XSn-4Z-TFE"/>
+                <constraint firstItem="o7E-yi-Xgv" firstAttribute="top" secondItem="qP8-Km-ykA" secondAttribute="bottom" constant="11" id="XSn-4Z-TFE"/>
                 <constraint firstItem="qP8-Km-ykA" firstAttribute="top" secondItem="Lv0-Mb-yF6" secondAttribute="top" constant="20" symbolic="YES" id="YrS-XJ-bPn"/>
                 <constraint firstItem="o7E-yi-Xgv" firstAttribute="leading" secondItem="Lv0-Mb-yF6" secondAttribute="leading" constant="75" id="ja3-jM-TjZ"/>
             </constraints>
@@ -187,25 +190,16 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7ol-9l-ruu">
-                    <rect key="frame" x="85" y="140" width="265" height="17"/>
+                    <rect key="frame" x="85" y="120" width="265" height="102"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Download Airlock for iPhone and start it!" id="XKR-LX-1XF">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="XKR-LX-1XF">
                         <font key="font" metaFont="system"/>
+                        <string key="title">Download Airlock for iPhone and start it!
+ Visit http://airlock.io/ in your MobileSafari on your iPhone or install "Airlock for iOS" directly from the AppStore.</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="emy-VW-aka">
-                    <rect key="frame" x="137" y="104" width="161" height="32"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="push" title="Go to the AppStore" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="sAI-Qa-fju">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="clickDownloadButton:" target="vv7-F3-WCS" id="mxc-8O-0ld"/>
-                    </connections>
-                </button>
                 <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="zK7-mQ-jWe">
                     <rect key="frame" x="209" y="59" width="16" height="16"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -221,10 +215,8 @@
                 </textField>
             </subviews>
             <constraints>
-                <constraint firstAttribute="centerY" secondItem="7ol-9l-ruu" secondAttribute="centerY" constant="27" id="Bo3-3J-TGB"/>
+                <constraint firstAttribute="centerY" secondItem="7ol-9l-ruu" secondAttribute="centerY" constant="49.5" id="Bo3-3J-TGB"/>
                 <constraint firstAttribute="centerX" secondItem="zK7-mQ-jWe" secondAttribute="centerX" id="T8V-Hy-FrQ"/>
-                <constraint firstAttribute="centerX" secondItem="emy-VW-aka" secondAttribute="centerX" id="YOL-0c-I7G"/>
-                <constraint firstAttribute="centerY" secondItem="emy-VW-aka" secondAttribute="centerY" id="bNr-DR-U7r"/>
                 <constraint firstAttribute="bottom" secondItem="zK7-mQ-jWe" secondAttribute="bottom" constant="59" id="jXA-0H-IHF"/>
                 <constraint firstAttribute="centerX" secondItem="7ol-9l-ruu" secondAttribute="centerX" id="k5X-vO-OzX"/>
             </constraints>

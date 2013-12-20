@@ -11,9 +11,10 @@
 
 extern NSString *const kALNotificationsBluetoothServiceDidFoundNewDeviceNotification;
 extern NSString *const kALNotificationsBluetoothServiceDeviceDisappearedNotification;
+extern NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification;
 
 
-@interface ALBluetoothScanner : NSObject <CBCentralManagerDelegate>
+@interface ALBluetoothScanner : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (strong, nonatomic) NSMutableDictionary *discovered;
 

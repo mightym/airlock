@@ -102,6 +102,33 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
     }
 }
 
+
+- (void)read:(ALAirlockCharacteristic)characteristicToRead from:(CBPeripheral*)peripheral callback:(void(^)(NSData* value))callback
+{
+    if (peripheral.state == CBPeripheralStateConnected) {
+        CBUUID* characteristicUuid = nil;
+        if (characteristicToRead == ALAirlockCharacteristicChallengeCharacteristic) characteristicUuid = self.characteristicReadChallengeUUID;
+        [self characteristicWithUUID:characteristicUuid
+                                from:peripheral
+                             service:peripheral.services.firstObject
+                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
+                               /*
+                               self.callbackOnReadValue = nil;
+                               peripheral.delegate = self;
+                               [peripheral readValueForCharacteristic:characteristic];
+                                */
+                           } missingBlock:^(CBService *service, CBPeripheral *peripheral) {
+                               
+                           }];
+    } else {
+        NSLog(@"not connected anymore"); // TODO reconnect
+    }
+}
+
+- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(NSData* newValue))callback
+{
+}
+
 #pragma mark - CBCentralManagerDelegate
 
 

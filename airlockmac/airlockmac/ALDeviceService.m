@@ -9,6 +9,7 @@
 #import "ALDeviceService.h"
 #import "ALBluetoothScanner.h"
 #import "ALDiscoveredDevice.h"
+#import "ALChallengeHelper.h"
 
 @implementation ALDeviceService
 
@@ -72,6 +73,22 @@
         if (self.delegate) [self.delegate airlockDeviceService:self
                                                didUpdateDevice:device];
     }
+}
+
+#pragma mark -
+
+- (void)sendPairingChallenge:(ALDiscoveredDevice*)device
+{
+    [[ALBluetoothScanner sharedService] read:ALAirlockCharacteristicChallengeCharacteristic
+                                        from:device.peripheral
+                                    callback:^void (NSData* value) {
+                                        NSString *incomingChallenge = [[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding];
+                                        NSString *challengeResponse = [ALChallengeHelper calculateResponseForIncomingChallenge:incomingChallenge
+                                                                                                             outgoingChallenge:[ALChallengeHelper generateNewChallenge]];
+                                        [NSAlert alertWithMessageText:@"yay"
+                                                        defaultButton:@"Okay"
+                                                      alternateButton:nil otherButton:nil informativeTextWithFormat:nil];
+                                    }];
 }
 
 @end

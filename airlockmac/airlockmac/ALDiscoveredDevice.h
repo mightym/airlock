@@ -20,4 +20,6 @@
 
 - (NSString*)description;
 
+- (void)sendPairingRequestAndCallback:(void (^)(void))callback;
+
 @end

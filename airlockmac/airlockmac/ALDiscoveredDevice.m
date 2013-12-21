@@ -8,6 +8,7 @@
 
 #import "ALDiscoveredDevice.h"
 #import "ALDeviceHelper.h"
+#import "ALDeviceService.h"
 
 @implementation ALDiscoveredDevice
 
@@ -16,6 +17,11 @@
     return [NSString stringWithFormat:@"%@ - %@",
             [self.deviceName isEqualToString:@""] ? @"<unknown>" : self.deviceName,
             [ALDeviceHelper platformString:self.platform]];
+}
+
+- (void)sendPairingRequestAndCallback:(void (^)(void))callback {
+    ALDeviceService* deviceService = [[ALDeviceService alloc] init];
+    [deviceService sendPairingChallenge:self];
 }
 
 @end

@@ -13,6 +13,7 @@
                 <outlet property="step1ViewController" destination="e9y-WK-fO4" id="fow-je-noM"/>
                 <outlet property="step2ViewController" destination="vv7-F3-WCS" id="5T9-Vh-YWl"/>
                 <outlet property="step3ViewController" destination="qNE-yC-Z0p" id="Bc5-BS-Q6e"/>
+                <outlet property="step4ViewController" destination="XhW-3B-Cnh" id="NZd-TO-f9h"/>
                 <outlet property="window" destination="1" id="3"/>
             </connections>
         </customObject>
@@ -230,6 +231,47 @@ DQ
                 <constraint firstAttribute="centerX" secondItem="7ol-9l-ruu" secondAttribute="centerX" id="k5X-vO-OzX"/>
             </constraints>
         </customView>
+        <customView id="w2X-9z-7qX">
+            <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pag-KC-ZMa">
+                    <rect key="frame" x="86" y="137" width="263" height="68"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="JhD-p7-CWN">
+                        <font key="font" metaFont="system"/>
+                        <string key="title">Awesome!
+
+Now confirm to pair to this Mac on your iPhone...</string>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="gmh-sD-zOo">
+                    <rect key="frame" x="209" y="59" width="16" height="16"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                </progressIndicator>
+                <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KjM-gm-kKp">
+                    <rect key="frame" x="18" y="29" width="398" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="status" id="TPi-jK-LHN">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="gmh-sD-zOo" firstAttribute="top" secondItem="pag-KC-ZMa" secondAttribute="bottom" constant="62" id="5C1-Lk-VMe"/>
+                <constraint firstItem="pag-KC-ZMa" firstAttribute="leading" secondItem="w2X-9z-7qX" secondAttribute="leading" constant="88" id="Hko-8X-cAY"/>
+                <constraint firstItem="KjM-gm-kKp" firstAttribute="centerX" secondItem="gmh-sD-zOo" secondAttribute="centerX" id="Pag-if-GqF"/>
+                <constraint firstItem="pag-KC-ZMa" firstAttribute="top" secondItem="w2X-9z-7qX" secondAttribute="top" constant="38" id="Val-bi-MQq"/>
+                <constraint firstAttribute="trailing" secondItem="KjM-gm-kKp" secondAttribute="trailing" constant="20" symbolic="YES" id="hYs-pR-zs6"/>
+                <constraint firstItem="KjM-gm-kKp" firstAttribute="top" secondItem="gmh-sD-zOo" secondAttribute="bottom" constant="13" id="hb2-qH-yvQ"/>
+                <constraint firstItem="KjM-gm-kKp" firstAttribute="leading" secondItem="w2X-9z-7qX" secondAttribute="leading" constant="20" symbolic="YES" id="nsS-fS-iWM"/>
+                <constraint firstItem="pag-KC-ZMa" firstAttribute="centerX" secondItem="gmh-sD-zOo" secondAttribute="centerX" id="oHJ-13-Cje"/>
+            </constraints>
+        </customView>
         <viewController title="Step 2" id="vv7-F3-WCS" customClass="ALSetupStep2ViewController">
             <connections>
                 <outlet property="progressIndicator" destination="zK7-mQ-jWe" id="Jqo-u2-5pY"/>
@@ -243,6 +285,12 @@ DQ
                 <outlet property="setupWindowController" destination="-2" id="tcd-iF-7qN"/>
                 <outlet property="tableView" destination="zzG-gl-Rjc" id="9C8-hi-mOG"/>
                 <outlet property="view" destination="Lv0-Mb-yF6" id="jpB-1d-p8q"/>
+            </connections>
+        </viewController>
+        <viewController id="XhW-3B-Cnh" customClass="ALSetupStep4ViewController">
+            <connections>
+                <outlet property="setupWindowController" destination="-2" id="JQd-f5-Hu5"/>
+                <outlet property="view" destination="w2X-9z-7qX" id="0tv-6X-CQU"/>
             </connections>
         </viewController>
     </objects>

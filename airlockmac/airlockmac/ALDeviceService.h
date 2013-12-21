@@ -16,6 +16,8 @@
 - (void)scanForNearbyDevices;
 - (void)stopScanning;
 
+- (void)sendPairingChallenge:(ALDiscoveredDevice*)device;
+
 - (NSArray *)devices;
 
 @property (nonatomic, weak) id<ALDeviceServiceDelegate> delegate;
@@ -26,7 +28,7 @@
 
 @protocol ALDeviceServiceDelegate <NSObject>
 
-@required
+@optional
 - (void)airlockDeviceService:(ALDeviceService*)service didFoundDevice:(ALDiscoveredDevice*)device;
 - (void)airlockDeviceService:(ALDeviceService*)service didRemoveDeviceWithIdentifier:(NSUUID*)identifier;
 - (void)airlockDeviceService:(ALDeviceService*)service didUpdateDevice:(ALDiscoveredDevice*)device;

@@ -27,7 +27,7 @@
 }
 
 - (void)stop {
-    if (self.deviceService == nil) [self.deviceService stopScanning];
+    if (self.deviceService != nil) [self.deviceService stopScanning];
 }
 
 #pragma mark -

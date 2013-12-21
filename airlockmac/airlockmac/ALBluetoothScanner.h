@@ -13,6 +13,10 @@ extern NSString *const kALNotificationsBluetoothServiceDidFoundNewDeviceNotifica
 extern NSString *const kALNotificationsBluetoothServiceDeviceDisappearedNotification;
 extern NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification;
 
+typedef enum {
+	ALAirlockCharacteristicChallengeCharacteristic,
+    ALAirlockCharacteristicChallengeResponseCharacteristic
+} ALAirlockCharacteristic;
 
 @interface ALBluetoothScanner : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
@@ -20,7 +24,10 @@ extern NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification
 
 + (instancetype)sharedService;
 
--(void)startScanning;
--(void)stopScanning;
+- (void)startScanning;
+- (void)stopScanning;
+
+- (void)read:(ALAirlockCharacteristic)characteristicToRead from:(CBPeripheral*)peripheral callback:(void(^)(NSData* value))callback;
+- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(NSData* newValue))callback;
 
 @end

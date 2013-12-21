@@ -7,14 +7,15 @@
 //
 
 #import "ALDiscoveredDevice.h"
+#import "ALDeviceHelper.h"
 
 @implementation ALDiscoveredDevice
 
 - (NSString*)description
 {
-    return [NSString stringWithFormat:@"%@ (%@)",
+    return [NSString stringWithFormat:@"%@ - %@",
             [self.deviceName isEqualToString:@""] ? @"<unknown>" : self.deviceName,
-            self.platform];
+            [ALDeviceHelper platformString:self.platform]];
 }
 
 @end

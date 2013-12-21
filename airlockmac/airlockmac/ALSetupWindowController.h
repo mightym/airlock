@@ -7,8 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "ALDiscoveredDevice.h"
 
 @interface ALSetupWindowController : NSWindowController
+
+@property (nonatomic, strong) IBOutlet NSButton *continueButton;
+@property (nonatomic, strong) ALDiscoveredDevice *selectedDevice;
 
 - (void)showNext;
 

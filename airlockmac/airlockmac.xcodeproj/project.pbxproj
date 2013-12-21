@@ -37,6 +37,7 @@
 		F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */; };
 		F647AA27183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */; };
 		F647AA29183B6AF400CAA7BF /* IOBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */; };
+		F677E74618663DEB00F042D4 /* ALDeviceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = F677E74518663DEB00F042D4 /* ALDeviceHelper.m */; };
 		F6865C95185F5A74005DD8F4 /* ALSetupService.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865C94185F5A74005DD8F4 /* ALSetupService.m */; };
 		F6865C9B185F5B87005DD8F4 /* ALSetupWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865C99185F5B87005DD8F4 /* ALSetupWindowController.m */; };
 		F6865C9C185F5B87005DD8F4 /* ALSetupWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F6865C9A185F5B87005DD8F4 /* ALSetupWindowController.xib */; };
@@ -109,6 +110,8 @@
 		F647AA24183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALLoginscreenOverlayWindowController.m; sourceTree = "<group>"; };
 		F647AA25183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ALLoginscreenOverlayWindowController.xib; sourceTree = "<group>"; };
 		F647AA28183B6AF400CAA7BF /* IOBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOBluetooth.framework; path = System/Library/Frameworks/IOBluetooth.framework; sourceTree = SDKROOT; };
+		F677E74418663DEB00F042D4 /* ALDeviceHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALDeviceHelper.h; sourceTree = "<group>"; };
+		F677E74518663DEB00F042D4 /* ALDeviceHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALDeviceHelper.m; sourceTree = "<group>"; };
 		F6865C93185F5A74005DD8F4 /* ALSetupService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALSetupService.h; sourceTree = "<group>"; };
 		F6865C94185F5A74005DD8F4 /* ALSetupService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALSetupService.m; sourceTree = "<group>"; };
 		F6865C98185F5B87005DD8F4 /* ALSetupWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALSetupWindowController.h; sourceTree = "<group>"; };
@@ -211,6 +214,8 @@
 		4D84C0201833D1D100F3D2D9 /* airlockmac */ = {
 			isa = PBXGroup;
 			children = (
+				F677E74318663DC900F042D4 /* Helper */,
+				F6865CAB1861CDB3005DD8F4 /* Model */,
 				F6865C96185F5B18005DD8F4 /* Views */,
 				F6865C91185F5A48005DD8F4 /* Services */,
 				F647AA1A183A73B000CAA7BF /* Assets */,
@@ -293,6 +298,15 @@
 			name = Assets;
 			sourceTree = "<group>";
 		};
+		F677E74318663DC900F042D4 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				F677E74418663DEB00F042D4 /* ALDeviceHelper.h */,
+				F677E74518663DEB00F042D4 /* ALDeviceHelper.m */,
+			);
+			name = Helper;
+			sourceTree = "<group>";
+		};
 		F6865C91185F5A48005DD8F4 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -315,7 +329,6 @@
 		F6865C96185F5B18005DD8F4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				F6865CAB1861CDB3005DD8F4 /* Model */,
 				F6865C97185F5B1E005DD8F4 /* Setup */,
 			);
 			name = Views;
@@ -497,6 +510,7 @@
 				F6865C95185F5A74005DD8F4 /* ALSetupService.m in Sources */,
 				F6865CA3185F6952005DD8F4 /* ALDeviceService.m in Sources */,
 				F6180E39184F439E00550BCE /* ALMainWindowController.m in Sources */,
+				F677E74618663DEB00F042D4 /* ALDeviceHelper.m in Sources */,
 				F6865CA618608FEB005DD8F4 /* ALSetupStep3ViewController.m in Sources */,
 				F6865C9F185F6604005DD8F4 /* ALSetupStep2ViewController.m in Sources */,
 				F6865CAA1861C3CC005DD8F4 /* ALBluetoothScanner.m in Sources */,

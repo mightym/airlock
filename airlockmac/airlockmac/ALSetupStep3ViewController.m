@@ -72,35 +72,44 @@
 
 - (void)airlockDeviceService:(ALDeviceService *)service didUpdateDevice:(ALDiscoveredDevice *)device
 {
-    if (![device.deviceName isEqualToString:@""] && ![device.platform isEqualToString:@""]) {
-        if (![self.listOfFoundDevices containsObject:device]) {
-            [self.listOfFoundDevices addObject:device];
-        }
-        [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:[self.listOfFoundDevices indexOfObject:device]]
-                                  columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    if (![self.listOfFoundDevices containsObject:device]) {
+        [self.listOfFoundDevices addObject:device];
     }
+    [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:[self.listOfFoundDevices indexOfObject:device]]
+                              columnIndexes:[NSIndexSet indexSetWithIndex:0]];
 }
 
 #pragma mark - NSTableViewDatasource
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView;
 {
-    return [self.listOfFoundDevices count];
+    return MAX([self.listOfFoundDevices count], 1);
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    ALDiscoveredDevice* device = (ALDiscoveredDevice*)[self.listOfFoundDevices objectAtIndex:row];
-    return [NSString stringWithString:device.description];
+    if ([self.listOfFoundDevices count] > 0) {
+        ALDiscoveredDevice* device = (ALDiscoveredDevice*)[self.listOfFoundDevices objectAtIndex:row];
+        return [NSString stringWithString:device.description];
+    } else {
+        return @"searching for devices...";
+    }
 }
 
 #pragma mark - NSTableViewDelegate
-/*
+
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    NSLog(@"tableViewSelectionDidChange");
+    if (self.tableView.selectedRowIndexes.count > 0 && self.listOfFoundDevices.count > 0) {
+        ALDiscoveredDevice* selectedDevice = (ALDiscoveredDevice*)[self.listOfFoundDevices objectAtIndex:self.tableView.selectedRowIndexes.firstIndex];
+        self.setupWindowController.selectedDevice = selectedDevice;
+        [self.setupWindowController.continueButton setEnabled:YES];
+    } else {
+        self.setupWindowController.selectedDevice = nil;
+        [self.setupWindowController.continueButton setEnabled:NO];
+    }
 }
- */
+
 
 
 @end

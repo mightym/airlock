@@ -23,7 +23,6 @@ typedef enum {
 @property (nonatomic, strong) IBOutlet NSView *innerView;
 
 @property (nonatomic, strong) IBOutlet NSButton *quitButton;
-@property (nonatomic, strong) IBOutlet NSButton *continueButton;
 
 @property (nonatomic, strong) IBOutlet NSViewController *step1ViewController;
 @property (nonatomic, strong) IBOutlet ALSetupStep2ViewController *step2ViewController;

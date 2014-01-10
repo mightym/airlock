@@ -48,6 +48,15 @@
 		F6865CA618608FEB005DD8F4 /* ALSetupStep3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865CA518608FEB005DD8F4 /* ALSetupStep3ViewController.m */; };
 		F6865CAA1861C3CC005DD8F4 /* ALBluetoothScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865CA91861C3CC005DD8F4 /* ALBluetoothScanner.m */; };
 		F6865CAE1861CDD0005DD8F4 /* ALDiscoveredDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = F6865CAD1861CDD0005DD8F4 /* ALDiscoveredDevice.m */; };
+		F6956635187C62FA007BFCF8 /* NSMutableArray+fifoQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = F6956624187C62F9007BFCF8 /* NSMutableArray+fifoQueue.m */; };
+		F6956636187C62FA007BFCF8 /* YMS128.c in Sources */ = {isa = PBXBuildFile; fileRef = F6956625187C62F9007BFCF8 /* YMS128.c */; };
+		F6956637187C62FA007BFCF8 /* YMSCBCentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F6956628187C62FA007BFCF8 /* YMSCBCentralManager.m */; };
+		F6956638187C62FA007BFCF8 /* YMSCBCharacteristic.m in Sources */ = {isa = PBXBuildFile; fileRef = F695662A187C62FA007BFCF8 /* YMSCBCharacteristic.m */; };
+		F6956639187C62FA007BFCF8 /* YMSCBDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = F695662C187C62FA007BFCF8 /* YMSCBDescriptor.m */; };
+		F695663A187C62FA007BFCF8 /* YMSCBPeripheral.m in Sources */ = {isa = PBXBuildFile; fileRef = F695662E187C62FA007BFCF8 /* YMSCBPeripheral.m */; };
+		F695663B187C62FA007BFCF8 /* YMSCBService.m in Sources */ = {isa = PBXBuildFile; fileRef = F6956630187C62FA007BFCF8 /* YMSCBService.m */; };
+		F695663C187C62FA007BFCF8 /* YMSCBStoredPeripherals.m in Sources */ = {isa = PBXBuildFile; fileRef = F6956632187C62FA007BFCF8 /* YMSCBStoredPeripherals.m */; };
+		F695663D187C62FA007BFCF8 /* YMSCBUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = F6956634187C62FA007BFCF8 /* YMSCBUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +142,24 @@
 		F6865CA91861C3CC005DD8F4 /* ALBluetoothScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALBluetoothScanner.m; sourceTree = "<group>"; };
 		F6865CAC1861CDD0005DD8F4 /* ALDiscoveredDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALDiscoveredDevice.h; sourceTree = "<group>"; };
 		F6865CAD1861CDD0005DD8F4 /* ALDiscoveredDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALDiscoveredDevice.m; sourceTree = "<group>"; };
+		F6956623187C62F9007BFCF8 /* NSMutableArray+fifoQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+fifoQueue.h"; sourceTree = "<group>"; };
+		F6956624187C62F9007BFCF8 /* NSMutableArray+fifoQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+fifoQueue.m"; sourceTree = "<group>"; };
+		F6956625187C62F9007BFCF8 /* YMS128.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = YMS128.c; sourceTree = "<group>"; };
+		F6956626187C62F9007BFCF8 /* YMS128.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMS128.h; sourceTree = "<group>"; };
+		F6956627187C62F9007BFCF8 /* YMSCBCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBCentralManager.h; sourceTree = "<group>"; };
+		F6956628187C62FA007BFCF8 /* YMSCBCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBCentralManager.m; sourceTree = "<group>"; };
+		F6956629187C62FA007BFCF8 /* YMSCBCharacteristic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBCharacteristic.h; sourceTree = "<group>"; };
+		F695662A187C62FA007BFCF8 /* YMSCBCharacteristic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBCharacteristic.m; sourceTree = "<group>"; };
+		F695662B187C62FA007BFCF8 /* YMSCBDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBDescriptor.h; sourceTree = "<group>"; };
+		F695662C187C62FA007BFCF8 /* YMSCBDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBDescriptor.m; sourceTree = "<group>"; };
+		F695662D187C62FA007BFCF8 /* YMSCBPeripheral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBPeripheral.h; sourceTree = "<group>"; };
+		F695662E187C62FA007BFCF8 /* YMSCBPeripheral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBPeripheral.m; sourceTree = "<group>"; };
+		F695662F187C62FA007BFCF8 /* YMSCBService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBService.h; sourceTree = "<group>"; };
+		F6956630187C62FA007BFCF8 /* YMSCBService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBService.m; sourceTree = "<group>"; };
+		F6956631187C62FA007BFCF8 /* YMSCBStoredPeripherals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBStoredPeripherals.h; sourceTree = "<group>"; };
+		F6956632187C62FA007BFCF8 /* YMSCBStoredPeripherals.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBStoredPeripherals.m; sourceTree = "<group>"; };
+		F6956633187C62FA007BFCF8 /* YMSCBUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YMSCBUtils.h; sourceTree = "<group>"; };
+		F6956634187C62FA007BFCF8 /* YMSCBUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YMSCBUtils.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -370,6 +397,7 @@
 		F6865CA71861C3AB005DD8F4 /* Bluetooth */ = {
 			isa = PBXGroup;
 			children = (
+				F6956620187C62A9007BFCF8 /* YMSCoreBluetooth */,
 				F6865CA81861C3CC005DD8F4 /* ALBluetoothScanner.h */,
 				F6865CA91861C3CC005DD8F4 /* ALBluetoothScanner.m */,
 			);
@@ -383,6 +411,31 @@
 				F6865CAD1861CDD0005DD8F4 /* ALDiscoveredDevice.m */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		F6956620187C62A9007BFCF8 /* YMSCoreBluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				F6956623187C62F9007BFCF8 /* NSMutableArray+fifoQueue.h */,
+				F6956624187C62F9007BFCF8 /* NSMutableArray+fifoQueue.m */,
+				F6956625187C62F9007BFCF8 /* YMS128.c */,
+				F6956626187C62F9007BFCF8 /* YMS128.h */,
+				F6956627187C62F9007BFCF8 /* YMSCBCentralManager.h */,
+				F6956628187C62FA007BFCF8 /* YMSCBCentralManager.m */,
+				F6956629187C62FA007BFCF8 /* YMSCBCharacteristic.h */,
+				F695662A187C62FA007BFCF8 /* YMSCBCharacteristic.m */,
+				F695662B187C62FA007BFCF8 /* YMSCBDescriptor.h */,
+				F695662C187C62FA007BFCF8 /* YMSCBDescriptor.m */,
+				F695662D187C62FA007BFCF8 /* YMSCBPeripheral.h */,
+				F695662E187C62FA007BFCF8 /* YMSCBPeripheral.m */,
+				F695662F187C62FA007BFCF8 /* YMSCBService.h */,
+				F6956630187C62FA007BFCF8 /* YMSCBService.m */,
+				F6956631187C62FA007BFCF8 /* YMSCBStoredPeripherals.h */,
+				F6956632187C62FA007BFCF8 /* YMSCBStoredPeripherals.m */,
+				F6956633187C62FA007BFCF8 /* YMSCBUtils.h */,
+				F6956634187C62FA007BFCF8 /* YMSCBUtils.m */,
+			);
+			name = YMSCoreBluetooth;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -517,18 +570,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6956636187C62FA007BFCF8 /* YMS128.c in Sources */,
+				F695663A187C62FA007BFCF8 /* YMSCBPeripheral.m in Sources */,
+				F6956639187C62FA007BFCF8 /* YMSCBDescriptor.m in Sources */,
 				F6865C95185F5A74005DD8F4 /* ALSetupService.m in Sources */,
+				F695663B187C62FA007BFCF8 /* YMSCBService.m in Sources */,
 				F6865CA3185F6952005DD8F4 /* ALDeviceService.m in Sources */,
+				F695663D187C62FA007BFCF8 /* YMSCBUtils.m in Sources */,
 				F677E74C1866463700F042D4 /* ALChallengeHelper.m in Sources */,
+				F6956635187C62FA007BFCF8 /* NSMutableArray+fifoQueue.m in Sources */,
 				F6180E39184F439E00550BCE /* ALMainWindowController.m in Sources */,
 				F677E74618663DEB00F042D4 /* ALDeviceHelper.m in Sources */,
 				F677E7491866410800F042D4 /* ALSetupStep4ViewController.m in Sources */,
 				F6865CA618608FEB005DD8F4 /* ALSetupStep3ViewController.m in Sources */,
+				F6956638187C62FA007BFCF8 /* YMSCBCharacteristic.m in Sources */,
 				F6865C9F185F6604005DD8F4 /* ALSetupStep2ViewController.m in Sources */,
+				F6956637187C62FA007BFCF8 /* YMSCBCentralManager.m in Sources */,
 				F6865CAA1861C3CC005DD8F4 /* ALBluetoothScanner.m in Sources */,
 				F647AA1E183A746100CAA7BF /* ALAirlockService.m in Sources */,
 				4D84C0271833D1D100F3D2D9 /* main.m in Sources */,
 				F6865CAE1861CDD0005DD8F4 /* ALDiscoveredDevice.m in Sources */,
+				F695663C187C62FA007BFCF8 /* YMSCBStoredPeripherals.m in Sources */,
 				4D84C02E1833D1D100F3D2D9 /* ALAppDelegate.m in Sources */,
 				F647AA26183A79CC00CAA7BF /* ALLoginscreenOverlayWindowController.m in Sources */,
 				F6865C9B185F5B87005DD8F4 /* ALSetupWindowController.m in Sources */,

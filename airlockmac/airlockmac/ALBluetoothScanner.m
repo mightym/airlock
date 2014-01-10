@@ -9,6 +9,9 @@
 #import "ALBluetoothScanner.h"
 #import "ALDiscoveredDevice.h"
 
+#import "NSMutableArray+fifoQueue.h"
+
+
 NSString *const kALNotificationsBluetoothServiceDidFoundNewDeviceNotification = @"kALNotificationsBluetoothServiceDidFoundNewDeviceNotification";
 NSString *const kALNotificationsBluetoothServiceDeviceDisappearedNotification = @"kALNotificationsBluetoothServiceDeviceDisappearedNotification";
 NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kALNotificationsBluetoothServiceDeviceUpdatedNotification";
@@ -36,6 +39,11 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 
 @property (strong, nonatomic) NSMutableArray *peripheralIdentifierToIgnore;
 @property (strong, nonatomic) NSMutableArray *currentPeripherals;
+
+@property (strong, nonatomic) NSMutableArray *readCallbackStack;
+@property (strong, nonatomic) NSMutableArray *writeCallbackStack;
+
+@property (nonatomic, strong) NSString* responseValueBuffer;
 
 @end
 
@@ -66,6 +74,9 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
         self.characteristicReadChallengeUUID = [CBUUID UUIDWithString:kALCharacteristicReadChallengeUUID];
         self.peripheralIdentifierToIgnore = [NSMutableArray array];
         self.currentPeripherals = [NSMutableArray array];
+        
+        self.readCallbackStack = [NSMutableArray array];
+        self.writeCallbackStack = [NSMutableArray array];
     }
     return self;
 }
@@ -107,26 +118,69 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 {
     if (peripheral.state == CBPeripheralStateConnected) {
         CBUUID* characteristicUuid = nil;
-        if (characteristicToRead == ALAirlockCharacteristicChallengeCharacteristic) characteristicUuid = self.characteristicReadChallengeUUID;
-        [self characteristicWithUUID:characteristicUuid
-                                from:peripheral
-                             service:peripheral.services.firstObject
-                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
-                               /*
-                               self.callbackOnReadValue = nil;
-                               peripheral.delegate = self;
-                               [peripheral readValueForCharacteristic:characteristic];
-                                */
-                           } missingBlock:^(CBService *service, CBPeripheral *peripheral) {
-                               
-                           }];
+
+        if (characteristicToRead == ALAirlockCharacteristicChallengeCharacteristic) {
+            characteristicUuid = self.characteristicReadChallengeUUID;
+        }
+        
+        if (characteristicUuid == nil) return;
+        [self serviceWithUUID:self.serviceUUID
+                         from:peripheral
+                    withBlock:^(CBService *service, CBPeripheral *peripheral) {
+                        [self characteristicWithUUID:characteristicUuid
+                                                from:peripheral
+                                             service:service
+                                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
+                                               [self.readCallbackStack push:callback];
+                                               peripheral.delegate = self;
+                                               [peripheral readValueForCharacteristic:characteristic];
+                                           } missingBlock:^(CBService *service, CBPeripheral *peripheral) {
+                                               NSLog(@"Cant read characteristic %d", characteristicToRead);
+                                           }];
+                    } missingBlock:^(CBPeripheral *peripheral) {
+                        NSLog(@"Cant use service %@", self.serviceUUID);
+                    }];
     } else {
         NSLog(@"not connected anymore"); // TODO reconnect
     }
 }
 
-- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(NSData* newValue))callback
+- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(void))callback responseCallback:(void(^)(NSString*response))responseCallback
 {
+    if (peripheral.state == CBPeripheralStateConnected) {
+        CBUUID* characteristicUuid = nil;
+        
+        if (characteristicToWrite == ALAirlockCharacteristicChallengeResponseCharacteristic) {
+            characteristicUuid = self.characteristicWriteChallengeUUID;
+        }
+        
+        if (characteristicUuid == nil) return;
+        [self serviceWithUUID:self.serviceUUID
+                         from:peripheral
+                    withBlock:^(CBService *service, CBPeripheral *peripheral) {
+                        [self characteristicWithUUID:characteristicUuid
+                                                from:peripheral
+                                             service:service
+                                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
+                                               [self.writeCallbackStack push:@{
+                                                                               @"callback": callback, // writeCallback
+                                                                               @"responseCallback": responseCallback,
+                                                                               @"value": value,
+                                                                               @"characteristic": characteristic,
+                                                                               @"service": service,
+                                                                               @"peripheral": peripheral
+                                                                               }];
+                                               peripheral.delegate = self;
+                                               [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+                                           } missingBlock:^(CBService *service, CBPeripheral *peripheral) {
+                                               NSLog(@"Cant write characteristic %d", characteristicToWrite);
+                                           }];
+                    } missingBlock:^(CBPeripheral *peripheral) {
+                        NSLog(@"Cant use service %@", self.serviceUUID);
+                    }];
+    } else {
+        NSLog(@"not connected anymore"); // TODO reconnect
+    }
 }
 
 #pragma mark - CBCentralManagerDelegate
@@ -194,6 +248,9 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
     [self deviceDisappeared:peripheral.identifier];
 }
 
+/**
+ *
+ */
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
@@ -277,6 +334,61 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
             }
         }
         
+        if ([characteristic.UUID isEqualTo:self.characteristicReadChallengeUUID]) {
+//            ALDiscoveredDevice *discoveredDevice = (ALDiscoveredDevice*)[self.discovered objectForKey:peripheral.identifier];
+            if (characteristic.value.length > 0) {
+                NSString* challengeValue = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+                NSLog(@"challengeValue %@", challengeValue);
+
+                void (^callback)(NSData* value) = [self.readCallbackStack pop];
+                if (callback) callback(characteristic.value);
+            }
+        }
+        
+        if ([characteristic.UUID isEqualTo:self.characteristicWriteChallengeUUID]) {
+            NSString *response = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+            if (self.responseValueBuffer == nil) self.responseValueBuffer = @"";
+            
+            self.responseValueBuffer = [self.responseValueBuffer stringByAppendingString:response];
+            if ([[self.responseValueBuffer substringFromIndex:(self.responseValueBuffer.length - 1)] isEqualToString:@"#"]) {
+                NSDictionary* writeRequest = (NSDictionary*)[self.writeCallbackStack pop];
+                void (^callback)(NSString*) = [writeRequest objectForKey:@"responseCallback"];
+                if (callback) callback([self.responseValueBuffer substringToIndex:(self.responseValueBuffer.length - 1)]);
+                self.responseValueBuffer = nil;
+            }
+
+        }
+    }
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, characteristic.UUID, [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding]);
+    if (error) {
+        NSLog(@"   error %@", error);
+        [self.centralManager cancelPeripheralConnection:peripheral];
+        [self.discovered removeObjectForKey:peripheral.identifier];
+    }
+    if (!error) {
+        if ([characteristic.UUID isEqualTo:self.characteristicWriteChallengeUUID]) {
+//            ALDiscoveredDevice *discoveredDevice = (ALDiscoveredDevice*)[self.discovered objectForKey:peripheral.identifier];
+            NSDictionary* writeRequest = (NSDictionary*)[self.writeCallbackStack firstObject];
+            void (^callback)(void) = [writeRequest objectForKey:@"callback"];
+            if (callback) callback();
+        }
+    }
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    NSLog(@"%s %@", __PRETTY_FUNCTION__, characteristic.UUID);
+    if (!error) {
+        if ([characteristic.UUID isEqualTo:self.characteristicWriteChallengeUUID]) {
+            NSDictionary* writeRequest = (NSDictionary*)self.writeCallbackStack.firstObject;
+            [peripheral writeValue:[writeRequest objectForKey:@"value"]
+                 forCharacteristic:characteristic
+                              type:CBCharacteristicWriteWithResponse];
+        }
     }
 }
 
@@ -330,10 +442,11 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 
 - (void)ignorePeripheral:(CBPeripheral*)peripheral
 {
+    NSLog(@"ignore %@", peripheral);
     if (peripheral.state == CBPeripheralStateConnected || peripheral.state == CBPeripheralStateConnecting) {
         [self.centralManager cancelPeripheralConnection:peripheral];
     }
-    [self.peripheralIdentifierToIgnore addObject:peripheral.identifier];
+//    [self.peripheralIdentifierToIgnore addObject:peripheral.identifier];
     [self deviceDisappeared:peripheral.identifier];
 }
 
@@ -359,7 +472,9 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
            missingBlock:(void (^)(CBPeripheral* peripheral))missingBlock
 {
     CBService* desiredService = nil;
+    NSLog(@"services");
     for (CBService* service in peripheral.services) {
+        NSLog(@"    %@", service.UUID);
         if ([service.UUID isEqual:uuid]) {
             desiredService = service;
             break;

@@ -7,6 +7,7 @@
 //
 
 #import "ALSetupStep4ViewController.h"
+#import "ALBluetoothScanner.h"
 
 @interface ALSetupStep4ViewController ()
 
@@ -16,6 +17,7 @@
 
 - (void)start {
     if (self.setupWindowController.selectedDevice) {
+        [[ALBluetoothScanner sharedService] stopScanning];
         [self.setupWindowController.selectedDevice sendPairingRequestAndCallback:^{
             [self.setupWindowController showNext];
         }];

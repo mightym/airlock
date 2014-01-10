@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
     </dependencies>
@@ -14,6 +14,7 @@
                 <outlet property="step2ViewController" destination="vv7-F3-WCS" id="5T9-Vh-YWl"/>
                 <outlet property="step3ViewController" destination="qNE-yC-Z0p" id="Bc5-BS-Q6e"/>
                 <outlet property="step4ViewController" destination="XhW-3B-Cnh" id="NZd-TO-f9h"/>
+                <outlet property="step5ViewController" destination="0gm-fC-bGe" id="jIj-d7-blF"/>
                 <outlet property="window" destination="1" id="3"/>
             </connections>
         </customObject>
@@ -23,7 +24,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="506" height="360"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="506" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -91,7 +92,7 @@ DQ
                 <outlet property="delegate" destination="-2" id="4"/>
             </connections>
         </window>
-        <customView id="CI2-ad-eoI">
+        <customView id="CI2-ad-eoI" userLabel="Step1View">
             <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -115,7 +116,7 @@ DQ
                 <constraint firstItem="QBd-oe-BdI" firstAttribute="leading" secondItem="CI2-ad-eoI" secondAttribute="leading" constant="75" id="yvo-wW-NO1"/>
             </constraints>
         </customView>
-        <customView id="Lv0-Mb-yF6">
+        <customView id="Lv0-Mb-yF6" userLabel="Step3View">
             <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -190,12 +191,12 @@ DQ
                 <constraint firstItem="o7E-yi-Xgv" firstAttribute="leading" secondItem="Lv0-Mb-yF6" secondAttribute="leading" constant="75" id="ja3-jM-TjZ"/>
             </constraints>
         </customView>
-        <viewController title="Step 1" id="e9y-WK-fO4">
+        <viewController title="Step 1" id="e9y-WK-fO4" userLabel="Setup Step1">
             <connections>
                 <outlet property="view" destination="CI2-ad-eoI" id="2fd-fu-MRH"/>
             </connections>
         </viewController>
-        <customView id="Drd-bt-Ecp">
+        <customView id="Drd-bt-Ecp" userLabel="Step2View">
             <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -231,7 +232,7 @@ DQ
                 <constraint firstAttribute="centerX" secondItem="7ol-9l-ruu" secondAttribute="centerX" id="k5X-vO-OzX"/>
             </constraints>
         </customView>
-        <customView id="w2X-9z-7qX">
+        <customView id="w2X-9z-7qX" userLabel="Step4View">
             <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -291,6 +292,34 @@ Now confirm to pair to this Mac on your iPhone...</string>
             <connections>
                 <outlet property="setupWindowController" destination="-2" id="JQd-f5-Hu5"/>
                 <outlet property="view" destination="w2X-9z-7qX" id="0tv-6X-CQU"/>
+            </connections>
+        </viewController>
+        <customView id="d0V-uR-cGN" userLabel="Step5View">
+            <rect key="frame" x="0.0" y="0.0" width="434" height="243"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7wJ-4A-P2u">
+                    <rect key="frame" x="86" y="137" width="263" height="68"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="68" id="21N-BR-yvc"/>
+                    </constraints>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Successfully paired!" id="MvH-hY-zt6">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="7wJ-4A-P2u" firstAttribute="centerX" secondItem="d0V-uR-cGN" secondAttribute="centerX" id="L6e-Ll-jQB"/>
+                <constraint firstItem="7wJ-4A-P2u" firstAttribute="leading" secondItem="d0V-uR-cGN" secondAttribute="leading" constant="88" id="Ojf-92-OWv"/>
+                <constraint firstItem="7wJ-4A-P2u" firstAttribute="top" secondItem="d0V-uR-cGN" secondAttribute="top" constant="38" id="gT8-mB-d43"/>
+            </constraints>
+        </customView>
+        <viewController id="0gm-fC-bGe" userLabel="Setup Step5">
+            <connections>
+                <outlet property="view" destination="d0V-uR-cGN" id="oUv-jx-kzx"/>
             </connections>
         </viewController>
     </objects>

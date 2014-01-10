@@ -77,17 +77,39 @@
 
 #pragma mark -
 
-- (void)sendPairingChallenge:(ALDiscoveredDevice*)device
+- (void)sendPairingChallenge:(ALDiscoveredDevice*)device callback:(void (^)(void))callback
 {
     [[ALBluetoothScanner sharedService] read:ALAirlockCharacteristicChallengeCharacteristic
                                         from:device.peripheral
                                     callback:^void (NSData* value) {
+                                        NSLog(@"value %@", value);
                                         NSString *incomingChallenge = [[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding];
+                                        NSString *outgoingChallenge = [ALChallengeHelper generateNewChallenge];
                                         NSString *challengeResponse = [ALChallengeHelper calculateResponseForIncomingChallenge:incomingChallenge
-                                                                                                             outgoingChallenge:[ALChallengeHelper generateNewChallenge]];
-                                        [NSAlert alertWithMessageText:@"yay"
-                                                        defaultButton:@"Okay"
-                                                      alternateButton:nil otherButton:nil informativeTextWithFormat:nil];
+                                                                                                             outgoingChallenge:outgoingChallenge];
+                                        [[ALBluetoothScanner sharedService] write:ALAirlockCharacteristicChallengeResponseCharacteristic
+                                                                               to:device.peripheral
+                                                                            value:[challengeResponse dataUsingEncoding:NSUTF8StringEncoding]
+                                                                         callback:^{
+                                                                             NSLog(@"challengeResponse written");
+                                                                         } responseCallback:^(NSString * response) {
+                                                                             NSLog(@"response %@", response);
+                                                                             NSArray *chunks = [response componentsSeparatedByString:@"."];
+                                                                             NSString *challengeResponse = chunks.firstObject;
+                                                                             NSString *newIncomingChallenge = chunks.lastObject;
+
+                                                                             NSString *expecedResponse = [ALChallengeHelper calculateResponseForIncomingChallenge:outgoingChallenge
+                                                                                                                                                         outgoingChallenge:newIncomingChallenge];
+                                                                             if ([response isEqualToString:expecedResponse])
+                                                                             {
+                                                                                 if (callback) callback();
+                                                                             } else {
+                                                                                dispatch_sync(dispatch_get_main_queue(), ^{
+                                                                                    NSAlert *alert = [NSAlert alertWithMessageText:@"An error occurred" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"foobar"];
+                                                                                    [alert runModal]; // beginSheetModalForWindow:nil completionHandler:nil];
+                                                                                });
+                                                                             }
+                                                                         }];
                                     }];
 }
 

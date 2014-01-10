@@ -28,6 +28,6 @@ typedef enum {
 - (void)stopScanning;
 
 - (void)read:(ALAirlockCharacteristic)characteristicToRead from:(CBPeripheral*)peripheral callback:(void(^)(NSData* value))callback;
-- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(NSData* newValue))callback;
+- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(void))callback responseCallback:(void(^)(NSString* response))responseCallback;
 
 @end

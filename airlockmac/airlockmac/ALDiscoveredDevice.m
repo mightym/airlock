@@ -21,7 +21,7 @@
 
 - (void)sendPairingRequestAndCallback:(void (^)(void))callback {
     ALDeviceService* deviceService = [[ALDeviceService alloc] init];
-    [deviceService sendPairingChallenge:self];
+    [deviceService sendPairingChallenge:self callback:callback];
 }
 
 @end

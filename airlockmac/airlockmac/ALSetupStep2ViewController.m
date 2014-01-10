@@ -48,13 +48,15 @@
 - (void)airlockDeviceService:(ALDeviceService *)service didFoundDevice:(ALDiscoveredDevice *)device
 {
     self.statusLabel.stringValue = @"checking nearby devices...";
+
+    [service stopScanning];
+    [self.progressIndicator setHidden:YES];
+    if (self.setupWindowController) [self.setupWindowController showNext];
+
 }
 
 - (void)airlockDeviceService:(ALDeviceService *)service didUpdateDevice:(ALDiscoveredDevice *)device
 {
-    [service stopScanning];
-    [self.progressIndicator setHidden:YES];
-    if (self.setupWindowController) [self.setupWindowController showNext];
 }
 
 - (void)airlockDeviceService:(ALDeviceService *)service didRemoveDeviceWithIdentifier:(NSUUID *)identifier

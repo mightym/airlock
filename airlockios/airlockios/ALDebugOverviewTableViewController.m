@@ -19,7 +19,7 @@
 #define kALCharacteristicReadChallengeUUID @"F966"
 #define kALChallengeSecret @"FBC29689-D890-4DCD-A7D2-41A95CAFBB5D"
 
-@interface ALDebugOverviewTableViewController () <CBPeripheralManagerDelegate>
+@interface ALDebugOverviewTableViewController () <CBPeripheralManagerDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) IBOutlet UISwitch* switchAdvertisePeripheral;
 @property (strong, nonatomic) CBPeripheralManager *peripheralManager;
@@ -34,6 +34,9 @@
 
 @property (nonatomic) NSString* queuedData;
 @property (nonatomic) NSString* readChallengeValue;
+
+@property (nonatomic, copy) void (^alertAcceptCallback)();
+@property (nonatomic, copy) void (^alertCancelCallback)();
 
 @end
 
@@ -209,8 +212,29 @@
             NSString *response = [NSString stringWithFormat:@"%@.%@", challengeResponse, newChallenge];
             NSLog(@"response %@", response);
             
-            [self sendChallengeResponse:response peripheral:peripheral];
-            [peripheral respondToRequest:firstRequest withResult:CBATTErrorSuccess];
+            /*
+            UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+            localNotification.alertBody = @"Test";
+            localNotification.alertAction = @"Accept";
+            localNotification.soundName = UILocalNotificationDefaultSoundName;
+            [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+             */
+
+            __block ALDebugOverviewTableViewController* blockSelf = self;
+            self.alertAcceptCallback = ^void() {
+                [blockSelf sendChallengeResponse:response peripheral:peripheral];
+                [peripheral respondToRequest:firstRequest withResult:CBATTErrorSuccess];
+            };
+            self.alertCancelCallback = ^void() {
+                [blockSelf sendChallengeResponse:@"user canceled" peripheral:peripheral];
+                [peripheral respondToRequest:firstRequest withResult:CBATTErrorWriteNotPermitted];
+            };
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Accept pairing"
+                                                                message:@"Lorem Ipsum"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"cancel"
+                                                      otherButtonTitles:@"accept", nil];
+            [alertView show];
         } else {
             NSLog(@"invalid challenge!");
             [self sendChallengeResponse:@"error" peripheral:peripheral];
@@ -252,6 +276,24 @@
 - (void)peripheralManager:(CBPeripheralManager *)peripheral central:(CBCentral *)central didSubscribeToCharacteristic:(CBCharacteristic *)characteristic
 {
     NSLog(@"%s %@", __PRETTY_FUNCTION__, central);
+}
+
+#pragma mark -
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) {
+        if (self.alertCancelCallback) {
+            self.alertCancelCallback();
+            self.alertCancelCallback = nil;
+        }
+    }
+    if (buttonIndex == 1) {
+        if (self.alertAcceptCallback) {
+            self.alertAcceptCallback();
+            self.alertAcceptCallback = nil;
+        }
+    }
 }
 
 #pragma mark -

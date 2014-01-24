@@ -18,8 +18,15 @@
 - (void)start {
     if (self.setupWindowController.selectedDevice) {
         [[ALBluetoothScanner sharedService] stopScanning];
+        
         [self.setupWindowController.selectedDevice sendPairingRequestAndCallback:^{
             [self.setupWindowController showNext];
+        }
+                                                                          failed:^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                NSAlert *alert = [NSAlert alertWithMessageText:@"An error occurred" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"foobar"];
+                [alert beginSheetModalForWindow:self.setupWindowController.window completionHandler:nil];
+            });
         }];
     }
 }

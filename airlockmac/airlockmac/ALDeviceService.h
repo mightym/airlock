@@ -16,7 +16,7 @@
 - (void)scanForNearbyDevices;
 - (void)stopScanning;
 
-- (void)sendPairingChallenge:(ALDiscoveredDevice*)device callback:(void (^)(void))callback;
+- (void)sendRequest:(NSString*)request toDevice:(ALDiscoveredDevice*)device callback:(void (^)(NSData *response))callback failed:(void (^)(void))failedCallback;
 
 - (NSArray *)devices;
 

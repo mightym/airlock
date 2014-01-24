@@ -53,10 +53,18 @@
 
 - (void)airlockDeviceService:(ALDeviceService *)service didFoundDevice:(ALDiscoveredDevice *)device
 {
+        NSLog(@"%s", __PRETTY_FUNCTION__);
+    if (![self.listOfFoundDevices containsObject:device]) {
+        [self.listOfFoundDevices addObject:device];
+    }
+    [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:[self.listOfFoundDevices indexOfObject:device]]
+                              columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+
 }
 
 - (void)airlockDeviceService:(ALDeviceService *)service didRemoveDeviceWithIdentifier:(NSUUID *)identifier
 {
+        NSLog(@"%s", __PRETTY_FUNCTION__);
     ALDiscoveredDevice* deviceToRemove = nil;
     for (ALDiscoveredDevice* device in self.listOfFoundDevices) {
         if ([device.identifier isEqualTo:identifier]) {
@@ -72,8 +80,10 @@
 
 - (void)airlockDeviceService:(ALDeviceService *)service didUpdateDevice:(ALDiscoveredDevice *)device
 {
+        NSLog(@"%s", __PRETTY_FUNCTION__);
     if (![self.listOfFoundDevices containsObject:device]) {
         [self.listOfFoundDevices addObject:device];
+        [self.tableView reloadData];
     }
     [self.tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:[self.listOfFoundDevices indexOfObject:device]]
                               columnIndexes:[NSIndexSet indexSetWithIndex:0]];

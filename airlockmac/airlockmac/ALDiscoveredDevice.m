@@ -19,9 +19,18 @@
             [ALDeviceHelper platformString:self.platform]];
 }
 
-- (void)sendPairingRequestAndCallback:(void (^)(void))callback {
+- (void)sendPairingRequestAndCallback:(void (^)(void))callback failed:(void (^)(void))failedCallback {
     ALDeviceService* deviceService = [[ALDeviceService alloc] init];
-    [deviceService sendPairingChallenge:self callback:callback];
+
+    [deviceService sendRequest:[NSString stringWithFormat:@"requestPairing@%@", [[NSHost currentHost] localizedName]]
+                      toDevice:self
+                      callback:^(NSData *response) {
+                          NSLog(@"response: %@", response);
+                          // TODO check response
+                          if (callback) callback();
+                      } failed:^{
+                          if (failedCallback) failedCallback();
+                      }];
 }
 
 @end

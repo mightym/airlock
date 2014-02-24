@@ -37,30 +37,9 @@
     [self.statusLabel setHidden:NO];
     [self.progressIndicator setHidden:NO];
     [self.progressIndicator startAnimation:self];
-
-    if (self.deviceService == nil) self.deviceService = [[ALDeviceService alloc] init];
-    self.deviceService.delegate = self;
-    [self.deviceService scanForNearbyDevices];
-}
-
-#pragma mark - ALDeviceServiceDelegate
-
-- (void)airlockDeviceService:(ALDeviceService *)service didFoundDevice:(ALDiscoveredDevice *)device
-{
-    self.statusLabel.stringValue = @"checking nearby devices...";
-
-    [service stopScanning];
+    
     [self.progressIndicator setHidden:YES];
     if (self.setupWindowController) [self.setupWindowController showNext];
-
-}
-
-- (void)airlockDeviceService:(ALDeviceService *)service didUpdateDevice:(ALDiscoveredDevice *)device
-{
-}
-
-- (void)airlockDeviceService:(ALDeviceService *)service didRemoveDeviceWithIdentifier:(NSUUID *)identifier
-{
 }
 
 #pragma mark - Interface Actions

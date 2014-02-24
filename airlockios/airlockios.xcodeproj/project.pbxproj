@@ -24,6 +24,7 @@
 		4D84C0AE1833D22000F3D2D9 /* airlockiosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C0AD1833D22000F3D2D9 /* airlockiosTests.m */; };
 		F647AA2B183B7AA800CAA7BF /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA2A183B7AA800CAA7BF /* CoreBluetooth.framework */; };
 		F647AA30183BACD100CAA7BF /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA2F183BACD100CAA7BF /* CoreLocation.framework */; };
+		F6BADE7A1884417500687AC4 /* NSData+AESAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = F6BADE791884417500687AC4 /* NSData+AESAdditions.m */; };
 		F6EC5E4A184376D30090BB39 /* ALDebugOverviewTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6EC5E49184376D30090BB39 /* ALDebugOverviewTableViewController.m */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,8 @@
 		4D84C0AD1833D22000F3D2D9 /* airlockiosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = airlockiosTests.m; sourceTree = "<group>"; };
 		F647AA2A183B7AA800CAA7BF /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		F647AA2F183BACD100CAA7BF /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		F6BADE781884417500687AC4 /* NSData+AESAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+AESAdditions.h"; sourceTree = "<group>"; };
+		F6BADE791884417500687AC4 /* NSData+AESAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+AESAdditions.m"; sourceTree = "<group>"; };
 		F6EC5E48184376D30090BB39 /* ALDebugOverviewTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALDebugOverviewTableViewController.h; sourceTree = "<group>"; };
 		F6EC5E49184376D30090BB39 /* ALDebugOverviewTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALDebugOverviewTableViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -133,6 +136,8 @@
 				4D84C0981833D22000F3D2D9 /* ALViewController.m */,
 				F6EC5E48184376D30090BB39 /* ALDebugOverviewTableViewController.h */,
 				F6EC5E49184376D30090BB39 /* ALDebugOverviewTableViewController.m */,
+				F6BADE781884417500687AC4 /* NSData+AESAdditions.h */,
+				F6BADE791884417500687AC4 /* NSData+AESAdditions.m */,
 				4D84C09A1833D22000F3D2D9 /* Images.xcassets */,
 				4D84C0861833D22000F3D2D9 /* Supporting Files */,
 			);
@@ -276,6 +281,7 @@
 			files = (
 				4D84C08C1833D22000F3D2D9 /* main.m in Sources */,
 				F6EC5E4A184376D30090BB39 /* ALDebugOverviewTableViewController.m in Sources */,
+				F6BADE7A1884417500687AC4 /* NSData+AESAdditions.m in Sources */,
 				4D84C0991833D22000F3D2D9 /* ALViewController.m in Sources */,
 				4D84C0901833D22000F3D2D9 /* ALAppDelegate.m in Sources */,
 			);

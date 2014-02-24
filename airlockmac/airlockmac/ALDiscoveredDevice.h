@@ -20,6 +20,6 @@
 
 - (NSString*)description;
 
-- (void)sendPairingRequestAndCallback:(void (^)(void))callback;
+- (void)sendPairingRequestAndCallback:(void (^)(void))callback failed:(void (^)(void))failedCallback;
 
 @end

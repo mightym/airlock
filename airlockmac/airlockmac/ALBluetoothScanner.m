@@ -16,11 +16,8 @@ NSString *const kALNotificationsBluetoothServiceDidFoundNewDeviceNotification = 
 NSString *const kALNotificationsBluetoothServiceDeviceDisappearedNotification = @"kALNotificationsBluetoothServiceDeviceDisappearedNotification";
 NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kALNotificationsBluetoothServiceDeviceUpdatedNotification";
 
-#define kALServiceUUID @"0A84"
-#define kALCharacteristicDeviceNameUUID @"5CFE"
-#define kALCharacteristicDevicePlatformUUID @"1319"
-#define kALCharacteristicWriteChallengeUUID @"482D"
-#define kALCharacteristicReadChallengeUUID @"F966"
+#define kALServiceUUID @"0a84"
+#define kALCharacteristicCryptedInterfaceUUID @"364f"
 #define kALChallengeSecret @"FBC29689-D890-4DCD-A7D2-41A95CAFBB5D"
 
 
@@ -32,10 +29,7 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 @property (strong, nonatomic) NSTimer *checkDisappearedDevicesTimer;
 
 @property (strong, nonatomic) CBUUID *serviceUUID;
-@property (strong, nonatomic) CBUUID *characteristicDeviceNameUUID;
-@property (strong, nonatomic) CBUUID *characteristicDevicePlatformUUID;
-@property (strong, nonatomic) CBUUID *characteristicWriteChallengeUUID;
-@property (strong, nonatomic) CBUUID *characteristicReadChallengeUUID;
+@property (strong, nonatomic) CBUUID *characteristicCryptedInterfaceUUID;
 
 @property (strong, nonatomic) NSMutableArray *peripheralIdentifierToIgnore;
 @property (strong, nonatomic) NSMutableArray *currentPeripherals;
@@ -43,7 +37,7 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 @property (strong, nonatomic) NSMutableArray *readCallbackStack;
 @property (strong, nonatomic) NSMutableArray *writeCallbackStack;
 
-@property (nonatomic, strong) NSString* responseValueBuffer;
+@property (nonatomic, strong) NSMutableData* responseValueBuffer;
 
 @end
 
@@ -68,10 +62,7 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
     if (self) {
         self.isScanningForPeripherals = NO;
         self.serviceUUID = [CBUUID UUIDWithString:kALServiceUUID];
-        self.characteristicDeviceNameUUID = [CBUUID UUIDWithString:kALCharacteristicDeviceNameUUID];
-        self.characteristicDevicePlatformUUID = [CBUUID UUIDWithString:kALCharacteristicDevicePlatformUUID];
-        self.characteristicWriteChallengeUUID = [CBUUID UUIDWithString:kALCharacteristicWriteChallengeUUID];
-        self.characteristicReadChallengeUUID = [CBUUID UUIDWithString:kALCharacteristicReadChallengeUUID];
+        self.characteristicCryptedInterfaceUUID = [CBUUID UUIDWithString:kALCharacteristicCryptedInterfaceUUID];
         self.peripheralIdentifierToIgnore = [NSMutableArray array];
         self.currentPeripherals = [NSMutableArray array];
         
@@ -100,7 +91,6 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 
 -(void)stopScanning
 {
-            NSLog(@"%s", __PRETTY_FUNCTION__);
     if (!self.isScanningForPeripherals) return;
     self.isScanningForPeripherals = NO;
     
@@ -114,44 +104,17 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 }
 
 
-- (void)read:(ALAirlockCharacteristic)characteristicToRead from:(CBPeripheral*)peripheral callback:(void(^)(NSData* value))callback
+- (void)write:(ALAirlockCharacteristic)characteristicToWrite
+           to:(CBPeripheral*)peripheral
+        value:(NSData*)value
+responseCallback:(void(^)(NSData *response))responseCallback
 {
-    if (peripheral.state == CBPeripheralStateConnected) {
-        CBUUID* characteristicUuid = nil;
-
-        if (characteristicToRead == ALAirlockCharacteristicChallengeCharacteristic) {
-            characteristicUuid = self.characteristicReadChallengeUUID;
-        }
-        
-        if (characteristicUuid == nil) return;
-        [self serviceWithUUID:self.serviceUUID
-                         from:peripheral
-                    withBlock:^(CBService *service, CBPeripheral *peripheral) {
-                        [self characteristicWithUUID:characteristicUuid
-                                                from:peripheral
-                                             service:service
-                                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
-                                               [self.readCallbackStack push:callback];
-                                               peripheral.delegate = self;
-                                               [peripheral readValueForCharacteristic:characteristic];
-                                           } missingBlock:^(CBService *service, CBPeripheral *peripheral) {
-                                               NSLog(@"Cant read characteristic %d", characteristicToRead);
-                                           }];
-                    } missingBlock:^(CBPeripheral *peripheral) {
-                        NSLog(@"Cant use service %@", self.serviceUUID);
-                    }];
-    } else {
-        NSLog(@"not connected anymore"); // TODO reconnect
-    }
-}
-
-- (void)write:(ALAirlockCharacteristic)characteristicToWrite to:(CBPeripheral*)peripheral value:(NSData*)value callback:(void(^)(void))callback responseCallback:(void(^)(NSString*response))responseCallback
-{
+    NSLog(@"%s %@", __PRETTY_FUNCTION__, [[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding]);
     if (peripheral.state == CBPeripheralStateConnected) {
         CBUUID* characteristicUuid = nil;
         
-        if (characteristicToWrite == ALAirlockCharacteristicChallengeResponseCharacteristic) {
-            characteristicUuid = self.characteristicWriteChallengeUUID;
+        if (characteristicToWrite == ALAirlockCharacteristicCryptedInterfaceCharacteristic) {
+            characteristicUuid = self.characteristicCryptedInterfaceUUID;
         }
         
         if (characteristicUuid == nil) return;
@@ -163,7 +126,6 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
                                              service:service
                                            withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
                                                [self.writeCallbackStack push:@{
-                                                                               @"callback": callback, // writeCallback
                                                                                @"responseCallback": responseCallback,
                                                                                @"value": value,
                                                                                @"characteristic": characteristic,
@@ -179,7 +141,7 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
                         NSLog(@"Cant use service %@", self.serviceUUID);
                     }];
     } else {
-        NSLog(@"not connected anymore"); // TODO reconnect
+        NSLog(@"not connected anymore"); // TODO reconnect?
     }
 }
 
@@ -223,8 +185,6 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
         
         [self.discovered setObject:discoveredDevice forKey:peripheral.identifier];
         
-        [self postNewDeviceNotification:discoveredDevice];
-        
         [self.centralManager connectPeripheral:peripheral
                                        options:@{CBConnectPeripheralOptionNotifyOnDisconnectionKey: @YES}];
     } else {
@@ -248,9 +208,6 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
     [self deviceDisappeared:peripheral.identifier];
 }
 
-/**
- *
- */
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
@@ -283,29 +240,11 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     if (service.characteristics.count > 0) {
-        [self characteristicWithUUID:self.characteristicDeviceNameUUID
-                                from:peripheral
-                             service:service
-                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
-                               [peripheral readValueForCharacteristic:characteristic];
-                           }
-                        missingBlock:^(CBService *service, CBPeripheral *peripheral) {
-                            NSLog(@"missing deviceName characteristic");
-                            [self ignorePeripheral:peripheral];
-                        }];
-
-        [self characteristicWithUUID:self.characteristicDevicePlatformUUID
-                                from:peripheral
-                             service:service
-                           withBlock:^(CBCharacteristic *characteristic, CBService *service, CBPeripheral *peripheral) {
-                               [peripheral readValueForCharacteristic:characteristic];
-                           }
-                        missingBlock:^(CBService *service, CBPeripheral *peripheral) {
-                            NSLog(@"missing platform characteristic");
-                            [self ignorePeripheral:peripheral];
-                        }];
+        ALDiscoveredDevice *discoveredDevice;
+        discoveredDevice = [self.discovered objectForKey:peripheral.identifier];
+        [self postNewDeviceNotification:discoveredDevice];
     } else {
-        [self ignorePeripheral:peripheral];
+        // [self ignorePeripheral:peripheral];
     }
 }
 
@@ -318,42 +257,17 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
         [self.discovered removeObjectForKey:peripheral.identifier];
     }
     if (!error) {
-        if ([characteristic.UUID isEqualTo:self.characteristicDeviceNameUUID]) {
-            ALDiscoveredDevice *discoveredDevice = (ALDiscoveredDevice*)[self.discovered objectForKey:peripheral.identifier];
-            if (characteristic.value.length > 0) {
-                discoveredDevice.deviceName = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-                [self postUpdateDeviceNotification:discoveredDevice];
-            }
-        }
         
-        if ([characteristic.UUID isEqualTo:self.characteristicDevicePlatformUUID]) {
-            ALDiscoveredDevice *discoveredDevice = (ALDiscoveredDevice*)[self.discovered objectForKey:peripheral.identifier];
-            if (characteristic.value.length > 0) {
-                discoveredDevice.platform = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-                [self postUpdateDeviceNotification:discoveredDevice];
-            }
-        }
-        
-        if ([characteristic.UUID isEqualTo:self.characteristicReadChallengeUUID]) {
-//            ALDiscoveredDevice *discoveredDevice = (ALDiscoveredDevice*)[self.discovered objectForKey:peripheral.identifier];
-            if (characteristic.value.length > 0) {
-                NSString* challengeValue = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-                NSLog(@"challengeValue %@", challengeValue);
-
-                void (^callback)(NSData* value) = [self.readCallbackStack pop];
-                if (callback) callback(characteristic.value);
-            }
-        }
-        
-        if ([characteristic.UUID isEqualTo:self.characteristicWriteChallengeUUID]) {
-            NSString *response = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-            if (self.responseValueBuffer == nil) self.responseValueBuffer = @"";
+        if ([characteristic.UUID isEqualTo:self.characteristicCryptedInterfaceUUID]) {
+            NSData *response = characteristic.value;
+            if (self.responseValueBuffer == nil) self.responseValueBuffer = [NSMutableData data];
             
-            self.responseValueBuffer = [self.responseValueBuffer stringByAppendingString:response];
-            if ([[self.responseValueBuffer substringFromIndex:(self.responseValueBuffer.length - 1)] isEqualToString:@"#"]) {
+            [self.responseValueBuffer appendData:response];
+            NSData *stopSequence = [self.responseValueBuffer subdataWithRange:NSMakeRange(self.responseValueBuffer.length - 5, 5)];
+            if ([[[NSString alloc] initWithData:stopSequence encoding:NSUTF8StringEncoding] isEqualToString:@"#EOM#"]) {
                 NSDictionary* writeRequest = (NSDictionary*)[self.writeCallbackStack pop];
-                void (^callback)(NSString*) = [writeRequest objectForKey:@"responseCallback"];
-                if (callback) callback([self.responseValueBuffer substringToIndex:(self.responseValueBuffer.length - 1)]);
+                void (^callback)(NSData*) = [writeRequest objectForKey:@"responseCallback"];
+                if (callback) callback([self.responseValueBuffer subdataWithRange:NSMakeRange(0, self.responseValueBuffer.length - 5)]);
                 self.responseValueBuffer = nil;
             }
 
@@ -370,12 +284,6 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
         [self.discovered removeObjectForKey:peripheral.identifier];
     }
     if (!error) {
-        if ([characteristic.UUID isEqualTo:self.characteristicWriteChallengeUUID]) {
-//            ALDiscoveredDevice *discoveredDevice = (ALDiscoveredDevice*)[self.discovered objectForKey:peripheral.identifier];
-            NSDictionary* writeRequest = (NSDictionary*)[self.writeCallbackStack firstObject];
-            void (^callback)(void) = [writeRequest objectForKey:@"callback"];
-            if (callback) callback();
-        }
     }
 }
 
@@ -383,12 +291,19 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
 {
     NSLog(@"%s %@", __PRETTY_FUNCTION__, characteristic.UUID);
     if (!error) {
-        if ([characteristic.UUID isEqualTo:self.characteristicWriteChallengeUUID]) {
+        NSLog(@"b");
+        if ([characteristic.UUID isEqualTo:self.characteristicCryptedInterfaceUUID]) {
+                    NSLog(@"c");
             NSDictionary* writeRequest = (NSDictionary*)self.writeCallbackStack.firstObject;
+            NSLog(@"%@", writeRequest);
             [peripheral writeValue:[writeRequest objectForKey:@"value"]
                  forCharacteristic:characteristic
                               type:CBCharacteristicWriteWithResponse];
         }
+    } else {
+        NSLog(@"error %@", error);
+        [self.centralManager cancelPeripheralConnection:peripheral];
+        [self.discovered removeObjectForKey:peripheral.identifier];
     }
 }
 
@@ -494,7 +409,9 @@ NSString *const kALNotificationsBluetoothServiceDeviceUpdatedNotification = @"kA
                   missingBlock:(void (^)(CBService* service, CBPeripheral* peripheral))missingBlock
 {
     CBCharacteristic* desiredCharacteristic = nil;
+    NSLog(@"CBCharacteristics (looking for %@)", uuid);
     for (CBCharacteristic* characteristic in service.characteristics) {
+        NSLog(@"   %@", characteristic.UUID);
         if ([characteristic.UUID isEqual:uuid]) {
             desiredCharacteristic = characteristic;
             break;

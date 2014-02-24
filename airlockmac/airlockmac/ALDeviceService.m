@@ -11,6 +11,8 @@
 #import "ALDiscoveredDevice.h"
 #import "ALChallengeHelper.h"
 
+#import "NSData+AESAdditions.h"
+
 @implementation ALDeviceService
 
 - (void)scanForNearbyDevices
@@ -60,9 +62,27 @@
 - (void)foundNewDevice:(NSNotification *)notification
 {
     if ([notification.userInfo objectForKey:@"newDevice"]) {
-        ALDiscoveredDevice* device = (ALDiscoveredDevice*)[notification.userInfo objectForKey:@"newDevice"];
+        __block ALDeviceService* blockself = self;
+        __block ALDiscoveredDevice* device = (ALDiscoveredDevice*)[notification.userInfo objectForKey:@"newDevice"];
         if (self.delegate) [self.delegate airlockDeviceService:self
                                                 didFoundDevice:device];
+        
+        [self sendRequest:@"deviceName" toDevice:device callback:^(NSData *response) {
+            NSLog(@"response %@", response);
+            NSString *salt = [[NSString alloc] initWithData:[response subdataWithRange:NSMakeRange([response length] - 32, 32)] encoding:NSUTF8StringEncoding];
+            NSData *cryptedData = [response subdataWithRange:NSMakeRange(0, [response length] - 32)];
+            
+            NSString *reply = [[NSString alloc] initWithData:[cryptedData AES256DecryptWithKey:@"4C2C93388CC841BB9BB69811CC0483E9" iv:salt] encoding:NSUTF8StringEncoding];
+            
+            device.deviceName = reply;
+            NSLog(@"%@", device.deviceName);
+            
+            if (blockself.delegate) [blockself.delegate airlockDeviceService:blockself
+                                                   didUpdateDevice:device];
+        } failed:^{
+            
+        }];
+
     }
 }
 
@@ -77,40 +97,20 @@
 
 #pragma mark -
 
-- (void)sendPairingChallenge:(ALDiscoveredDevice*)device callback:(void (^)(void))callback
+- (void)sendRequest:(NSString*)request toDevice:(ALDiscoveredDevice*)device callback:(void (^)(NSData *response))callback failed:(void (^)(void))failedCallback
 {
-    [[ALBluetoothScanner sharedService] read:ALAirlockCharacteristicChallengeCharacteristic
-                                        from:device.peripheral
-                                    callback:^void (NSData* value) {
-                                        NSLog(@"value %@", value);
-                                        NSString *incomingChallenge = [[NSString alloc] initWithData:value encoding:NSUTF8StringEncoding];
-                                        NSString *outgoingChallenge = [ALChallengeHelper generateNewChallenge];
-                                        NSString *challengeResponse = [ALChallengeHelper calculateResponseForIncomingChallenge:incomingChallenge
-                                                                                                             outgoingChallenge:outgoingChallenge];
-                                        [[ALBluetoothScanner sharedService] write:ALAirlockCharacteristicChallengeResponseCharacteristic
-                                                                               to:device.peripheral
-                                                                            value:[challengeResponse dataUsingEncoding:NSUTF8StringEncoding]
-                                                                         callback:^{
-                                                                             NSLog(@"challengeResponse written");
-                                                                         } responseCallback:^(NSString * response) {
-                                                                             NSLog(@"response %@", response);
-                                                                             NSArray *chunks = [response componentsSeparatedByString:@"."];
-                                                                             NSString *challengeResponse = chunks.firstObject;
-                                                                             NSString *newIncomingChallenge = chunks.lastObject;
 
-                                                                             NSString *expecedResponse = [ALChallengeHelper calculateResponseForIncomingChallenge:outgoingChallenge
-                                                                                                                                                         outgoingChallenge:newIncomingChallenge];
-                                                                             if ([response isEqualToString:expecedResponse])
-                                                                             {
-                                                                                 if (callback) callback();
-                                                                             } else {
-                                                                                dispatch_sync(dispatch_get_main_queue(), ^{
-                                                                                    NSAlert *alert = [NSAlert alertWithMessageText:@"An error occurred" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"foobar"];
-                                                                                    [alert runModal]; // beginSheetModalForWindow:nil completionHandler:nil];
-                                                                                });
-                                                                             }
-                                                                         }];
-                                    }];
+    NSString* salt = [ALChallengeHelper generateRandomString:32];
+    NSData* cryptedRequest = [[request dataUsingEncoding:NSUTF8StringEncoding] AES256EncryptWithKey:@"4C2C93388CC841BB9BB69811CC0483E9" iv:salt];
+    NSMutableData* cryptedRequestWithSalt = [cryptedRequest mutableCopy];
+    [cryptedRequestWithSalt appendData:[[NSString stringWithFormat:@"%@", salt] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [[ALBluetoothScanner sharedService] write:ALAirlockCharacteristicCryptedInterfaceCharacteristic
+                                           to:device.peripheral
+                                        value:cryptedRequestWithSalt
+                             responseCallback:^(NSData *response) {
+                                 if (callback) callback(response);
+                             }];
 }
 
 @end

@@ -15,6 +15,9 @@
 @property CLBeaconMajorValue major;
 @property CLBeaconMinorValue minor;
 @property BOOL notified;
+
+@property (nonatomic, strong) UILocalNotification *regionNotification;
+@property (nonatomic, strong) UILocalNotification *rangingNotification;
 @end
 
 
@@ -79,6 +82,14 @@
     NSLog(@"did enter Region %@", region.identifier);
     
     if ([region.identifier isEqualToString:@"com.airlock.ios"]) {
+        if (self.regionNotification) {
+            [[UIApplication sharedApplication] cancelLocalNotification:self.regionNotification];
+            self.regionNotification = nil;
+        }
+        self.regionNotification = [[UILocalNotification alloc] init];
+        self.regionNotification.alertBody = @"You entered the beacon region";
+        [[UIApplication sharedApplication] presentLocalNotificationNow:self.regionNotification];
+
         [manager startRangingBeaconsInRegion:self.region];
     }
 }
@@ -87,6 +98,14 @@
     NSLog(@"did exit Region %@", region.identifier);
 
     if ([manager.rangedRegions containsObject:region]) {
+        if (self.regionNotification) {
+            [[UIApplication sharedApplication] cancelLocalNotification:self.regionNotification];
+            self.regionNotification = nil;
+        }
+        self.regionNotification = [[UILocalNotification alloc] init];
+        self.regionNotification.alertBody = @"You left the beacon region";
+        [[UIApplication sharedApplication] presentLocalNotificationNow:self.regionNotification];
+
         [manager stopRangingBeaconsInRegion:self.region];
     }
 }
@@ -124,7 +143,10 @@
                inRegion:(CLBeaconRegion *)region {
     if ([beacons count] == 0) {
         NSLog(@"No Beacons in range");
-        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+        if (self.rangingNotification != nil) {
+            [[UIApplication sharedApplication] cancelLocalNotification:self.rangingNotification];
+            self.rangingNotification = nil;
+        }
         return;
     }
 
@@ -134,9 +156,10 @@
         case CLProximityUnknown:
         {
             NSLog(@"proximity: unknown");
-            self.notified = NO;
-            
-            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+            if (self.rangingNotification != nil) {
+                [[UIApplication sharedApplication] cancelLocalNotification:self.rangingNotification];
+                self.rangingNotification = nil;
+            }
         }
             break;
             
@@ -144,11 +167,10 @@
         {
             NSLog(@"proximity: immediate");
 
-            if (!self.notified) {
-                self.notified = YES;
-                UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-                localNotification.alertBody = @"beacon in immediate range";
-                [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
+            if (self.rangingNotification == nil) {
+                self.rangingNotification = [[UILocalNotification alloc] init];
+                self.rangingNotification.alertBody = @"beacon in immediate range";
+                [[UIApplication sharedApplication] presentLocalNotificationNow:self.rangingNotification];
             }
         }
             break;
@@ -156,18 +178,20 @@
         case CLProximityNear:
         {
             NSLog(@"proximity: near");
-            self.notified = NO;
-            
-            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+            if (self.rangingNotification != nil) {
+                [[UIApplication sharedApplication] cancelLocalNotification:self.rangingNotification];
+                self.rangingNotification = nil;
+            }
         }
             break;
             
         case CLProximityFar:
         {
             NSLog(@"proximity: far");
-            self.notified = NO;
-            
-            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+            if (self.rangingNotification != nil) {
+                [[UIApplication sharedApplication] cancelLocalNotification:self.rangingNotification];
+                self.rangingNotification = nil;
+            }
         }
             break;
     }

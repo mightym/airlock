@@ -49,7 +49,15 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-
+    if ([application applicationState] == UIApplicationStateActive) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
+                                                        message:nil
+                                                       delegate:nil
+                                              cancelButtonTitle:@"Ok"
+                                              otherButtonTitles:nil];
+        alert.title = notification.alertBody;
+        [alert show];
+    }
 }
 
 @end

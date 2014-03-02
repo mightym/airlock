@@ -22,8 +22,8 @@
 		4D84C0A41833D22000F3D2D9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D84C0831833D22000F3D2D9 /* UIKit.framework */; };
 		4D84C0AC1833D22000F3D2D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D84C0AA1833D22000F3D2D9 /* InfoPlist.strings */; };
 		4D84C0AE1833D22000F3D2D9 /* airlockiosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D84C0AD1833D22000F3D2D9 /* airlockiosTests.m */; };
-		F647AA2B183B7AA800CAA7BF /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA2A183B7AA800CAA7BF /* CoreBluetooth.framework */; };
 		F647AA30183BACD100CAA7BF /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F647AA2F183BACD100CAA7BF /* CoreLocation.framework */; };
+		F6D0707618BE95390096B7D3 /* ALBeaconListener.m in Sources */ = {isa = PBXBuildFile; fileRef = F6D0707518BE95390096B7D3 /* ALBeaconListener.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +59,8 @@
 		4D84C0AD1833D22000F3D2D9 /* airlockiosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = airlockiosTests.m; sourceTree = "<group>"; };
 		F647AA2A183B7AA800CAA7BF /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		F647AA2F183BACD100CAA7BF /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		F6D0707418BE95390096B7D3 /* ALBeaconListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALBeaconListener.h; sourceTree = "<group>"; };
+		F6D0707518BE95390096B7D3 /* ALBeaconListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALBeaconListener.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +69,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F647AA30183BACD100CAA7BF /* CoreLocation.framework in Frameworks */,
-				F647AA2B183B7AA800CAA7BF /* CoreBluetooth.framework in Frameworks */,
 				4D84C0821833D22000F3D2D9 /* CoreGraphics.framework in Frameworks */,
 				4D84C0841833D22000F3D2D9 /* UIKit.framework in Frameworks */,
 				4D84C0801833D22000F3D2D9 /* Foundation.framework in Frameworks */,
@@ -128,6 +129,8 @@
 				4D84C0941833D22000F3D2D9 /* Main_iPad.storyboard */,
 				4D84C0971833D22000F3D2D9 /* ALViewController.h */,
 				4D84C0981833D22000F3D2D9 /* ALViewController.m */,
+				F6D0707418BE95390096B7D3 /* ALBeaconListener.h */,
+				F6D0707518BE95390096B7D3 /* ALBeaconListener.m */,
 				4D84C09A1833D22000F3D2D9 /* Images.xcassets */,
 				4D84C0861833D22000F3D2D9 /* Supporting Files */,
 			);
@@ -269,6 +272,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6D0707618BE95390096B7D3 /* ALBeaconListener.m in Sources */,
 				4D84C08C1833D22000F3D2D9 /* main.m in Sources */,
 				4D84C0991833D22000F3D2D9 /* ALViewController.m in Sources */,
 				4D84C0901833D22000F3D2D9 /* ALAppDelegate.m in Sources */,

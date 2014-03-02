@@ -70,7 +70,7 @@
     [self.locationManager startMonitoringForRegion:self.region];
     
     // might improve detection delay, when immediately starting to range the region:
-    //    [self.locationManager startRangingBeaconsInRegion:self.region];
+    [self.locationManager startRangingBeaconsInRegion:self.region];
 }
 
 #pragma mark - CLLocationManagerDelegate
@@ -91,12 +91,12 @@
     }
 }
 
-- (void) locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region
+- (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region
 {
     [self.locationManager requestStateForRegion:self.region];
 }
 
-- (void) locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
+- (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
 {
     switch (state) {
         case CLRegionStateInside:
@@ -124,7 +124,6 @@
                inRegion:(CLBeaconRegion *)region {
     if ([beacons count] == 0) {
         NSLog(@"No Beacons in range");
-        [UIApplication sharedApplication].applicationIconBadgeNumber = -1;
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
         return;
     }
@@ -138,8 +137,6 @@
             self.notified = NO;
             
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
-            
-            [UIApplication sharedApplication].applicationIconBadgeNumber = -1;
         }
             break;
             
@@ -151,7 +148,6 @@
                 self.notified = YES;
                 UILocalNotification *localNotification = [[UILocalNotification alloc] init];
                 localNotification.alertBody = @"beacon in immediate range";
-                localNotification.applicationIconBadgeNumber = 1;
                 [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
             }
         }
@@ -163,8 +159,6 @@
             self.notified = NO;
             
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
-            
-            [UIApplication sharedApplication].applicationIconBadgeNumber = 2;
         }
             break;
             
@@ -174,8 +168,6 @@
             self.notified = NO;
             
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
-            
-            [UIApplication sharedApplication].applicationIconBadgeNumber = 3;
         }
             break;
     }

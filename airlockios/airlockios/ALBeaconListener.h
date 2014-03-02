@@ -12,7 +12,8 @@
 @interface ALBeaconListener : NSObject
 
 - (id)initWithUUID:(NSUUID*)beaconUUID;
-- (id)initWithUUID:(NSUUID*)theBeaconUUID major:(CLBeaconMajorValue)major minor:(CLBeaconMinorValue)minor;
+- (id)initWithUUID:(NSUUID*)beaconUUID major:(CLBeaconMajorValue)major;
+- (id)initWithUUID:(NSUUID*)beaconUUID major:(CLBeaconMajorValue)major minor:(CLBeaconMinorValue)minor;
 
 - (void)start;
 

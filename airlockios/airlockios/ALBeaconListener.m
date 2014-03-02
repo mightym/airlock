@@ -21,14 +21,19 @@
 @implementation ALBeaconListener
 
 - (id)initWithUUID:(NSUUID *)beaconUUID {
-    return [self initWithUUID:beaconUUID major:-1 minor:-1];
+    return [self initWithUUID:beaconUUID major:0 minor:0];
 }
 
-- (id)initWithUUID:(NSUUID*)theBeaconUUID major:(CLBeaconMajorValue)major minor:(CLBeaconMinorValue)minor
+- (id)initWithUUID:(NSUUID*)beaconUUID major:(CLBeaconMajorValue)major
+{
+    return [self initWithUUID:beaconUUID major:major minor:0];
+}
+
+- (id)initWithUUID:(NSUUID*)beaconUUID major:(CLBeaconMajorValue)major minor:(CLBeaconMinorValue)minor
 {
     self = [super init];
     if (self) {
-        self.beaconUUID = theBeaconUUID;
+        self.beaconUUID = beaconUUID;
         self.major = major;
         self.minor = minor;
         self.notified = NO;
@@ -36,6 +41,8 @@
     }
     return self;
 }
+
+#pragma mark -
 
 - (void)start
 {

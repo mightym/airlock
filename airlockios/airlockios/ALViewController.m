@@ -32,7 +32,8 @@
     NSUUID* beaconUUID = [[NSUUID alloc] initWithUUIDString:@"B9407F30-F5F8-466E-AFF9-25556B57FE6D"];
     self.beaconListener = [[ALBeaconListener alloc] initWithUUID:beaconUUID
                                                            major:40526
-                                                           minor:7099];
+                                                           // minor:7099
+                           ];
     [self.beaconListener start];
 }
 
